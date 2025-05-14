@@ -1,4 +1,8 @@
-from django.http import HttpResponse
+from django.shortcuts import render
+from .models import Spell
 
-def index(request):
-    return HttpResponse("you are at the spells app index")
+def spellList(request):
+
+
+    spells = Spell.object.all().order_by('name')
+    return render(request, 'spells/spell_list.html', {'spells': spells})

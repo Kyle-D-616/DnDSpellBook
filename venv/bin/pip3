@@ -1,4 +1,4 @@
-#!/home/neo/repos/DnDSpellBook/venv/bin/python3
+#!/home/trinity/repos/DnDSpellBook/venv/bin/python
 # -*- coding: utf-8 -*-
 import re
 import sys

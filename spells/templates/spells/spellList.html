@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Spell List</title>
+</head>
+<body>
+  <h1>Pick Your Spells</h1>
+    <form method="post">
+        {% csrf_token %}
+        <ul>
+            {% for spell in spells %}
+                <li>
+                    <input type="checkbox" name="selected_spells" value="{{ spell.id }}">
+                    <strong>{{ spell.name }}</strong> — {{ spell.spellLevelType }}
+                </li>
+            {% endfor %}
+        </ul>
+        <button type="submit">Add to Spell Book</button>
+    </form>
+</body>
+</html>
+
