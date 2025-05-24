@@ -9,7 +9,8 @@ class Spell(models.Model):
     components = models.CharField(max_length=255, blank=True, null=True)
     duration = models.CharField(max_length=50, blank=True, null=True)
     description = models.TextField(blank=True, null=True)
-    spellList = models.TextField(blank=True, null=True)
-    
+    spellList = models.CharField(max_length=50, blank=True, null=True)
+
     def __str__(self):
         return self.name
+

@@ -4,8 +4,18 @@
 <title>Spell List</title>
 </head>
 <body>
-  <h1>Pick Your Spells</h1>
-    <form method="post">
+<form method="get">
+	<label for="spellList">Filter by Spell List:</label>
+		<ul>
+	            {% for spell in spells %}
+        	        <li>
+                	    <input type="checkbox" name="selected_spellList" value="{{ spell.spellListst }}">
+                	    <strong>{{ spell.spellList }}</strong>
+                	</li>
+        	    {% endfor %}
+		</ul>
+	  <h1>Pick Your Spells</h1>
+	    <form method="post">
         {% csrf_token %}
         <ul>
             {% for spell in spells %}

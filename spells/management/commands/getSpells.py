@@ -34,7 +34,7 @@ class Command(BaseCommand):
             # Check if the spell already exists in the database
             if Spell.objects.filter(name=spellName).exists():
                 self.stdout.write(self.style.SUCCESS(f"Spell '{spellName}' already exists, skipping..."))
-                continue  # Skip to the next spell if it already exists
+            continue  # Skip to the next spell if it already exists
 
             # Spell body
             spellBodyDiv = soup.find('div', {'id': 'page-content'})
@@ -65,11 +65,11 @@ class Command(BaseCommand):
                         attr_index += 1
 
             # Extract "Spell Lists" separately
-            spell_lists = ""
+            spell_lists = set()
             for p in spellBody:
                 if p.name == 'p' and 'Spell Lists' in p.get_text():
-                    spell_lists = p.get_text(strip=True)
-
+                    text = p.get_text(strip=True).replace("Spell Lists.", "").replace("Spell Lists:","").replace(" (Optional)", "")
+                    spell_lists.update(s.strip() for s in text.split(","))
             # Create the description (excluding spell lists)
             spell_description = "\n".join(
                 attributes.get(f'atr{i}', '') for i in range(7, attr_index) if 'Spell Lists' not in attributes.get(f'atr{i}', '')
