@@ -1,16 +1,16 @@
 from django.shortcuts import render
-from .models import Spell
+from .models import Spell, SpellList
 
 
 def spellList(request):
-    selectedList = request.GET.get('spellList')
+    selectedList = request.GET.getlist('spellList')
 
     if selectedList:
-        spellsDisplayed = Spell.objects.filter(spellList__incontains=selectedList)
+        spellsDisplayed = Spell.objects.filter(spellList__name__in=selectedList).distinct()
     else:
         spellsDisplayed = Spell.objects.all()
 
-    spellListOptions = Spell.objects.values_list('spellList', flat=True).distinct()
+    spellListOptions = SpellList.objects.all()
 
     return render(request, 'spells/spellList.html', {
         'spells': spellsDisplayed,

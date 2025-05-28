@@ -7,13 +7,17 @@
 <form method="get">
 	<label for="spellList">Filter by Spell List:</label>
 		<ul>
-	            {% for spell in spells %}
+	            {% for list in spellListOptions %}
         	        <li>
-                	    <input type="checkbox" name="selected_spellList" value="{{ spell.spellListst }}">
-                	    <strong>{{ spell.spellList }}</strong>
+                	    <input type="checkbox" name="spellList" value="{{ list.name }}"
+				{% if list.name in selectedList %}checked{% endif %}>
+                	    <strong>{{ list.name }}</strong>
                 	</li>
         	    {% endfor %}
 		</ul>
+		<button type="submit">Filter</button>
+
+</form>
 	  <h1>Pick Your Spells</h1>
 	    <form method="post">
         {% csrf_token %}
