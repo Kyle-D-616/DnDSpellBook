@@ -1,12 +1,12 @@
 from django.db import models
 
-class SpellList(models.Model):
+class SpellList2014(models.Model):
     name =models.CharField(max_length=255, unique=True)
 
     def __str__(self):
         return self.name
 
-class Spell(models.Model):
+class Spell2014(models.Model):
     name = models.CharField(max_length=255, unique=True)
     source = models.CharField(max_length=255, blank=True, null=True)
     spellLevelType = models.CharField(max_length=255, blank=True, null=True)
@@ -16,7 +16,7 @@ class Spell(models.Model):
     duration = models.CharField(max_length=50, blank=True, null=True)
     description = models.TextField(blank=True, null=True)
 
-    spellList = models.ManyToManyField(SpellList)
+    spellList = models.ManyToManyField(SpellList2014)
 
     def __str__(self):
         return self.name

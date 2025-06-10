@@ -5,7 +5,7 @@
 </head>
 <body>
 <form method="get">
-	<label for="spellList">Filter by Spell List:</label>
+	<label>Filter by Spell List:</label>
 		<ul>
 	            {% for list in spellListOptions %}
         	        <li>
@@ -21,10 +21,21 @@
 	  <h1>Pick Your Spells</h1>
 	    <form method="post">
         {% csrf_token %}
+	<h2>2014 Spells (Legacy)</h2>
         <ul>
-            {% for spell in spells %}
+		{% for spell in spells2014 %}
                 <li>
                     <input type="checkbox" name="selected_spells" value="{{ spell.id }}">
+                    <strong>{{ spell.name }}</strong> — {{ spell.spellLevelType }}
+                </li>
+            {% endfor %}
+        </ul>
+	
+	<h2>2024 Spells</h2>
+        <ul>
+		{% for spell in spells2024%}
+                <li>
+                    <input type="checkbox" name="selected_spells_2024" value="{{ spell.id }}">
                     <strong>{{ spell.name }}</strong> — {{ spell.spellLevelType }}
                 </li>
             {% endfor %}
