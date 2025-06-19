@@ -1,0 +1,63 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>{% block title %}Spell Book{% endblock %}</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@700&family=EB+Garamond&display=swap" rel="stylesheet">
+
+    <style>
+        body {
+            font-family: 'EB Garamond', serif;
+            background: linear-gradient(135deg, #8B4513 0%, #D2691E 25%, #CD853F 50%, #D2691E 75%, #8B4513 100%);
+            color: #2d1b0e;
+            min-height: 100vh;
+        }
+
+        h1, h2, h3 {
+            font-family: 'Cinzel Decorative', cursive;
+        }
+
+        .scroll-container {
+            backdrop-filter: blur(3px);
+            background-color: rgba(255, 248, 220, 0.85);
+            box-shadow: 0 0 15px rgba(0, 0, 0, 0.3);
+        }
+
+        a {
+            color: #6b4226;
+            font-weight: bold;
+        }
+
+        a:hover {
+            text-decoration: underline;
+        }
+    </style>
+
+    {% block extra_head %}{% endblock %}
+</head>
+<body class="min-h-screen flex flex-col">
+
+    <!-- Header -->
+    <header class="text-center py-6 border-b-2 border-amber-800 bg-amber-100 bg-opacity-70 shadow-md">
+        <h1 class="text-5xl tracking-wider">Spell Book</h1>
+        <p class="italic text-lg">Your personal D&D spell collection</p>
+    </header>
+
+    <!-- Main Content -->
+    <main class="flex-grow container mx-auto px-4 py-6 scroll-container rounded-xl mt-6">
+        {% block content %}{% endblock %}
+    </main>
+
+    <!-- Footer -->
+    <footer class="text-center py-4 mt-auto text-sm text-amber-900">
+        &copy; {{ year|default:"2025" }} Spell Book. All rights reserved.
+    </footer>
+</body>
+</html>

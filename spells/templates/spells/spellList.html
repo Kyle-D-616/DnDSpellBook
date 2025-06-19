@@ -1,47 +1,126 @@
-<!DOCTYPE html>
-<html>
-<head>
-<title>Spell List</title>
-</head>
-<body>
-<form method="get">
-	<label>Filter by Spell List:</label>
-		<ul>
-	            {% for list in spellListOptions %}
-        	        <li>
-                	    <input type="checkbox" name="spellList" value="{{ list.name }}"
-				{% if list.name in selectedList %}checked{% endif %}>
-                	    <strong>{{ list.name }}</strong>
-                	</li>
-        	    {% endfor %}
-		</ul>
-		<button type="submit">Filter</button>
 
+{% extends "base.html" %}
+
+{% block title %}Spell List — Spell Book{% endblock %}
+
+{% block content %}
+<style>
+    .spell-card.selected {
+        transform: translateY(-8px) scale(1.02);
+        box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
+        border-color: #92400e;
+        background: linear-gradient(to bottom, #fef3c7, #fde68a);
+    }
+    
+    .spell-card {
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    
+    .spell-card:before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 3px;
+        background: linear-gradient(90deg, transparent, rgba(139, 69, 19, 0.3), transparent);
+    }
+</style>
+<h1 class="text-3xl font-bold mb-6">Pick Your Spells</h1>
+
+<!-- Version Toggle -->
+<div class="mb-6 text-center">
+    {% if version == '2024' %}
+        <p class="text-lg mb-3">Showing <strong>2024 Spells</strong></p>
+        <a href="?version=2014" class="px-4 py-2 bg-amber-700 text-white rounded hover:bg-amber-800 transition-colors">
+            Switch to 2014 (Legacy) Spells
+        </a>
+    {% else %}
+        <p class="text-lg mb-3">Showing <strong>2014 Spells (Legacy)</strong></p>
+        <a href="?version=2024" class="px-4 py-2 bg-amber-700 text-white rounded hover:bg-amber-800 transition-colors">
+            Switch to 2024 Spells
+        </a>
+    {% endif %}
+</div>
+
+<!-- Filter Form -->
+<form method="get" class="mb-8 p-4 bg-amber-50 bg-opacity-80 rounded-xl shadow-md">
+    <input type="hidden" name="version" value="{{ version }}">
+    <label class="text-lg font-semibold block mb-2">Filter by Spell List:</label>
+    <ul class="grid grid-cols-2 md:grid-cols-3 gap-2">
+        {% for list in spellListOptions %}
+            <li>
+                <label class="flex items-center gap-2">
+                    <input type="checkbox" name="spellList" value="{{ list.name }}"
+                        {% if list.name in selectedList %}checked{% endif %}
+                        class="accent-amber-800">
+                    <span class="font-medium">{{ list.name }}</span>
+                </label>
+            </li>
+        {% endfor %}
+    </ul>
+    <button type="submit" class="mt-4 px-4 py-2 bg-amber-800 text-white rounded hover:bg-amber-900">Filter</button>
 </form>
-	  <h1>Pick Your Spells</h1>
-	    <form method="post">
-        {% csrf_token %}
-	<h2>2014 Spells (Legacy)</h2>
-        <ul>
-		{% for spell in spells2014 %}
-                <li>
-                    <input type="checkbox" name="selected_spells" value="{{ spell.id }}">
-                    <strong>{{ spell.name }}</strong> — {{ spell.spellLevelType }}
-                </li>
-            {% endfor %}
-        </ul>
-	
-	<h2>2024 Spells</h2>
-        <ul>
-		{% for spell in spells2024%}
-                <li>
-                    <input type="checkbox" name="selected_spells_2024" value="{{ spell.id }}">
-                    <strong>{{ spell.name }}</strong> — {{ spell.spellLevelType }}
-                </li>
-            {% endfor %}
-        </ul>
-        <button type="submit">Add to Spell Book</button>
-    </form>
-</body>
-</html>
 
+<!-- Spell Selection Form -->
+<form method="post" class="space-y-8">
+    {% csrf_token %}
+
+    <div>
+        <h2 class="text-2xl font-semibold mb-4">
+            {% if version == '2024' %}2024 Spells{% else %}2014 Spells (Legacy){% endif %}
+        </h2>
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            {% for spell in spells %}
+                <div class="spell-card bg-gradient-to-b from-amber-50 to-amber-100 border-2 border-amber-300 rounded-lg shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 relative overflow-hidden">
+                    <!-- Page corner fold effect -->
+                    <div class="absolute top-0 right-0 w-0 h-0 border-l-[20px] border-l-transparent border-t-[20px] border-t-amber-200"></div>
+                    
+                    <label class="block p-4 cursor-pointer h-full">
+                        <input type="checkbox" name="selected_spells" value="{{ spell.id }}" class="spell-checkbox absolute top-3 left-3 accent-amber-700 scale-125">
+                        
+                        <div class="ml-8 space-y-2">
+                            <h3 class="text-lg font-bold text-amber-900 border-b border-amber-300 pb-1">{{ spell.name }}</h3>
+                            
+                            <div class="text-sm text-amber-800 space-y-1">
+                                <p class="italic font-medium">{{ spell.spellLevelType }}</p>
+                                {% if spell.castingTime %}<p><strong>Casting Time:</strong> {{ spell.castingTime }}</p>{% endif %}
+                                {% if spell.spellRange %}<p><strong>Range:</strong> {{ spell.spellRange }}</p>{% endif %}
+                                {% if spell.components %}<p><strong>Components:</strong> {{ spell.components }}</p>{% endif %}
+                                {% if spell.duration %}<p><strong>Duration:</strong> {{ spell.duration }}</p>{% endif %}
+                            </div>
+                            
+                            {% if spell.description %}
+                                <div class="text-sm text-gray-700 mt-3 pt-2 border-t border-amber-200">
+                                    <p class="leading-relaxed">{{ spell.description }}</p>
+                                </div>
+                            {% endif %}
+                        </div>
+                    </label>
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+
+    <button type="submit" class="block mt-6 px-6 py-3 bg-green-700 text-white font-bold rounded hover:bg-green-800">
+        Add to Spell Book
+    </button>
+</form>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const checkboxes = document.querySelectorAll('.spell-checkbox');
+    
+    checkboxes.forEach(checkbox => {
+        checkbox.addEventListener('change', function() {
+            const card = this.closest('.spell-card');
+            if (this.checked) {
+                card.classList.add('selected');
+            } else {
+                card.classList.remove('selected');
+            }
+        });
+    });
+});
+</script>
+{% endblock %}
