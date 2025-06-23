@@ -32,9 +32,6 @@
     {% csrf_token %}
 
     <div>
-        <h2 class="text-2xl font-semibold mb-4">
-            {% if version == '2024' %}2024 Spells{% else %}2014 Spells (Legacy){% endif %}
-        </h2>
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             {% for spell in spells %}
                 <div class="spell-card bg-gradient-to-b from-amber-50 to-amber-100 border-2 border-amber-300 rounded-lg shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 relative overflow-hidden">

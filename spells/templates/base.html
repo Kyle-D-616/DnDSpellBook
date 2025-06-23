@@ -38,6 +38,45 @@
         a:hover {
             text-decoration: underline;
         }
+
+        /* Browser Tab Styles */
+        .nav-tab {
+            position: relative;
+            padding: 8px 16px 12px 16px;
+            background: rgba(255, 248, 220, 0.6);
+            border: 1px solid #d97706;
+            border-bottom: none;
+            border-radius: 0;
+            color: #92400e;
+            font-weight: 600;
+            font-size: 14px;
+            margin-right: 2px;
+            transition: all 0.2s ease;
+            cursor: pointer;
+            box-shadow: 
+                0 -2px 4px rgba(0, 0, 0, 0.1),
+                inset 0 1px 0 rgba(255, 255, 255, 0.2);
+        }
+
+        .nav-tab:hover {
+            background: rgba(255, 248, 220, 0.8);
+            color: #7c2d12;
+            transform: translateY(-1px);
+        }
+
+        .nav-tab.active {
+            background: rgba(255, 248, 220, 0.85);
+            color: #7c2d12;
+            border-color: #d97706;
+            z-index: 10;
+            box-shadow: 
+                0 -4px 8px rgba(0, 0, 0, 0.15),
+                inset 0 1px 0 rgba(255, 255, 255, 0.4);
+        }
+
+        .nav-tab.active:hover {
+            transform: translateY(0);
+        }
     </style>
 
     {% block extra_head %}{% endblock %}
@@ -45,9 +84,29 @@
 <body class="min-h-screen flex flex-col">
 
     <!-- Header -->
-    <header class="text-center py-6 border-b-2 border-amber-800 bg-amber-100 bg-opacity-70 shadow-md">
+    <header class="sticky top-0 z-50 relative text-center py-6 border-b-2 border-amber-800 bg-amber-100 bg-opacity-70 shadow-md backdrop-blur-sm">
         <h1 class="text-5xl tracking-wider">Spell Book</h1>
         <p class="italic text-lg">Your personal D&D spell collection</p>
+        
+        <!-- Browser-style Tab Navigation -->
+        <div class="absolute bottom-0 left-4 flex">
+            <button id="allSpellsBtn" class="nav-tab">
+                All Spells
+            </button>
+            <button id="mySpellBookBtn" class="nav-tab active">
+                My Spell Book
+            </button>
+        </div>
+        
+        <!-- Action Buttons -->
+        <div class="absolute bottom-0 right-4 flex">
+            <button id="addToSpellBookBtn" class="nav-tab">
+                Add to Spell Book
+            </button>
+            <button id="clearSpellBookBtn" class="nav-tab">
+                Clear Spell Book
+            </button>
+        </div>
     </header>
 
     <!-- Main Content -->
@@ -59,5 +118,59 @@
     <footer class="text-center py-4 mt-auto text-sm text-amber-900">
         &copy; {{ year|default:"2025" }} Spell Book. All rights reserved.
     </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const navButtons = document.querySelectorAll('.nav-tab');
+            
+            navButtons.forEach(button => {
+                button.addEventListener('click', function() {
+                    // Remove active class from all buttons
+                    navButtons.forEach(btn => btn.classList.remove('active'));
+                    
+                    // Add active class to clicked button
+                    this.classList.add('active');
+                    
+                    // Handle button actions
+                    const buttonId = this.id;
+                    switch(buttonId) {
+                        case 'mySpellBookBtn':
+                            // Navigate to spell book page
+                            window.location.href = '/spellBook';
+                            break;
+                        case 'allSpellsBtn':
+                            // Navigate to all spells page
+                            window.location.href = '/';
+                            break;
+                        case 'addToSpellBookBtn':
+                            // Submit the spell selection form
+                            const spellForm = document.querySelector('form[method="post"]');
+                            if (spellForm) {
+                                spellForm.submit();
+                            } else {
+                                alert('No spells selected or form not found');
+                            }
+                            break;
+                        case 'clearSpellBookBtn':
+                            // Confirm and clear spell book
+                            if (confirm('Are you sure you want to clear your entire spell book? This action cannot be undone.')) {
+                                // Add logic to clear spell book here
+                                alert('Spell book cleared! (This would need backend implementation)');
+                            }
+                            break;
+                    }
+                });
+            });
+            
+            // Set active button based on current page
+            const currentPath = window.location.pathname;
+            if (currentPath.includes('spellList')) {
+                document.getElementById('allSpellsBtn').classList.add('active');
+                document.getElementById('mySpellBookBtn').classList.remove('active');
+            } else if (currentPath.includes('spells')) {
+                document.getElementById('mySpellBookBtn').classList.add('active');
+            }
+        });
+    </script>
 </body>
 </html>

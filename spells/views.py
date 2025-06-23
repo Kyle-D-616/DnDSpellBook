@@ -36,17 +36,13 @@ def spellList(request):
 
 def spellBook(request):
     selectedSpellIds = request.session.get('selectedSpells', [])
+    spells2024 = Spell2024.objects.filter(id__in=selectedSpellIds)
+    spells2014 = Spell2014.objects.filter(id__in=selectedSpellIds)
 
-    spells = Spell2024.objects.filter(id__in=selectedSpellIds) | Spell2014.objects.filter(id__in=selectedSpellIds) 
-    version = '2024'
-    spellListOptions = []
-    selectedList = None
-    selectedSpells = selectedSpellIds
+    from itertools import chain
+    spellBookSpells = list(chain(spells2024, spells2014))
+
 
     return render(request, 'spells/spellBook.html', {
-        'version': version,
-        'spells': spells,
-        'spellListOptions': spellListOptions,
-        'selectedList': selectedSpells,
-        'selectedSpells': selectedSpells,
+        'spellBookSpells': spellBookSpells,
     })
