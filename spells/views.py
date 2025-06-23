@@ -34,16 +34,16 @@ def spellList(request):
         'selectedSpells': selectedSpells,
     })
 
-def mySpellBook(request):
+def spellBook(request):
     selectedSpellIds = request.session.get('selectedSpells', [])
 
-    spells = Spell2024.objects.filter(id__in=selectedSpellIds)
+    spells = Spell2024.objects.filter(id__in=selectedSpellIds) | Spell2014.objects.filter(id__in=selectedSpellIds) 
     version = '2024'
     spellListOptions = []
     selectedList = None
     selectedSpells = selectedSpellIds
 
-    return render(request, 'spells/spellList.html', {
+    return render(request, 'spells/spellBook.html', {
         'version': version,
         'spells': spells,
         'spellListOptions': spellListOptions,
