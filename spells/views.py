@@ -9,10 +9,9 @@ def spellList(request):
 
     if request.method == 'POST':
         selectedSpellIds = request.POST.getlist('selectedSpells')
+        print(f"POST data: {selectedSpellIds}")
         request.session['selectedSpells'] = [int(id) for id in selectedSpellIds]
         request.session.modified = True
-
-
 
     if version == '2024':
         spells = Spell2024.objects.all()
@@ -35,13 +34,16 @@ def spellList(request):
     })
 
 def spellBook(request):
-    selectedSpellIds = request.session.get('selectedSpells', [])
+
+
+    selectedSpellIds = request.session.get('selectedSpells')
     spells2024 = Spell2024.objects.filter(id__in=selectedSpellIds)
     spells2014 = Spell2014.objects.filter(id__in=selectedSpellIds)
 
     from itertools import chain
     spellBookSpells = list(chain(spells2024, spells2014))
-
+    print("here are the spell id: ")
+    print(request.session.get('selectedSpells', []))
 
     return render(request, 'spells/spellBook.html', {
         'spellBookSpells': spellBookSpells,

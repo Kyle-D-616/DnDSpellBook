@@ -52,7 +52,7 @@
                 <label class="flex items-center gap-2">
                     <input type="checkbox" name="spellList" value="{{ list.name }}"
                         {% if list.name in selectedList %}checked{% endif %}
-			{% if spell.id in selected_spells %}checked{% endif %}
+
                         class="accent-amber-800">
                     <span class="font-medium">{{ list.name }}</span>
                 </label>
@@ -72,12 +72,13 @@
         </h2>
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             {% for spell in spells %}
+	    
                 <div class="spell-card bg-gradient-to-b from-amber-50 to-amber-100 border-2 border-amber-300 rounded-lg shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 relative overflow-hidden">
                     <!-- Page corner fold effect -->
                     <div class="absolute top-0 right-0 w-0 h-0 border-l-[20px] border-l-transparent border-t-[20px] border-t-amber-200"></div>
                     
                     <label class="block p-4 cursor-pointer h-full">
-                        <input type="checkbox" name="selected_spells" value="{{ spell.id }}" class="spell-checkbox absolute top-3 left-3 accent-amber-700 scale-125">
+                        <input type="checkbox" name="selectedSpells" value="{{ spell.id }}" {% if spell.id in selectedSpells %}checked{% endif %} class="spell-checkbox absolute top-3 left-3 accent-amber-700 scale-125">
                         
                         <div class="ml-8 space-y-2">
                             <h3 class="text-lg font-bold text-amber-900 border-b border-amber-300 pb-1">{{ spell.name }}</h3>
@@ -101,7 +102,7 @@
             {% endfor %}
         </div>
     </div>
-
+<button type="submit" class="mt-6 px-6 py-3 bg-green-700 text-white font-bold rounded hover:bg-green-800">Add to Spell Book</button> 
 </form>
 
 <script>

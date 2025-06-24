@@ -33,13 +33,13 @@
 
     <div>
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {% for spell in spells %}
+            {% for spell in spellBookSpells %}
                 <div class="spell-card bg-gradient-to-b from-amber-50 to-amber-100 border-2 border-amber-300 rounded-lg shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 relative overflow-hidden">
                     <!-- Page corner fold effect -->
                     <div class="absolute top-0 right-0 w-0 h-0 border-l-[20px] border-l-transparent border-t-[20px] border-t-amber-200"></div>
                     
                     <label class="block p-4 cursor-pointer h-full">
-                        <input type="checkbox" name="selected_spells" value="{{ spell.id }}" class="spell-checkbox absolute top-3 left-3 accent-amber-700 scale-125">
+                        <input type="checkbox" name="selectedSpells" value="{{ spell.id }}" class="spell-checkbox absolute top-3 left-3 accent-amber-700 scale-125">
                         
                         <div class="ml-8 space-y-2">
                             <h3 class="text-lg font-bold text-amber-900 border-b border-amber-300 pb-1">{{ spell.name }}</h3>
@@ -65,12 +65,7 @@
     </div>
 
     <a href="spellBook/" class="block mt-6 px-6 py-3 bg-green-700 text-white font-bold rounded hover:bg-green-800">
-        Remove from Spell Book
-    </button>
-</form>
-
-<script>
-document.addEventListener('DOMContentLoaded', function() {
+        Remove from Spell Boo {
     const checkboxes = document.querySelectorAll('.spell-checkbox');
     
     checkboxes.forEach(checkbox => {
