@@ -78,31 +78,34 @@ class Command(BaseCommand):
             spell_range  = attributes.get('atr4', '')
             components   = attributes.get('atr5', '')
             duration     = attributes.get('atr6', '')
-
+            
+         for spell in spell_level:
+            print(f"{spell}")
+            
             # Create or update the spell
-            spell = Spell2024(
-                name=spellName,
-                source=spell_source,
-                spellLevelType=spell_level,
-                castingTime=casting_time,
-                spellRange=spell_range,
-                components=components,
-                duration=duration,
-                description=spell_description,
-            )
-            # Save the spell to the database
-            spell.save()
-
-            list_objs = []
-            for list_name in spell_lists:
-                list_name = list_name.strip()
-                if not list_name:
-                    continue
-                spell_list_obj, _ = SpellList2024.objects.get_or_create(name=list_name)
-                list_objs.append(spell_list_obj)
-
-            spell.spellList.set(list_objs)
-
-            self.stdout.write(self.style.SUCCESS(f"Successfully added spell '{spellName}'"))
-
-        self.stdout.write(self.style.SUCCESS('Successfully updated the database with new spells'))
+#            spell = Spell2024(
+#                name=spellName,
+#                source=spell_source,
+#                spellLevelType=spell_level,
+#                castingTime=casting_time,
+#                spellRange=spell_range,
+#                components=components,
+#                duration=duration,
+#                description=spell_description,
+#            )
+#            # Save the spell to the database
+#            spell.save()
+#
+#            list_objs = []
+#            for list_name in spell_lists:
+#                list_name = list_name.strip()
+#                if not list_name:
+#                    continue
+#                spell_list_obj, _ = SpellList2024.objects.get_or_create(name=list_name)
+#                list_objs.append(spell_list_obj)
+#
+#            spell.spellList.set(list_objs)
+#
+#            self.stdout.write(self.style.SUCCESS(f"Successfully added spell '{spellName}'"))
+#
+#        self.stdout.write(self.style.SUCCESS('Successfully updated the database with new spells'))
