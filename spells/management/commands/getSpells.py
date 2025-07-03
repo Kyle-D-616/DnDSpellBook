@@ -70,18 +70,22 @@ class Command(BaseCommand):
                 if p.name == 'p' and 'Spell Lists' in p.get_text():
                     text = p.get_text(strip=True).replace("Spell Lists.", "").replace("Spell Lists:","").replace(" (Optional)", "")
                     spell_lists.update(s.strip() for s in text.split(","))
-            #Extract spell level and sepll type
+            #Extract spell level and spell type
+            spellSchool = ''
+            spellLevel = ''
+            
             for p in spellBody:
                 if p.name == 'p' and 'cantrip' in p.get_text():
-                        spellLevelText = attributes.get('atr2', '')
-                        spellLevelTextSplit = spellLevelText.split( )
-                        spell_school = ' '.join(spellLevelTextSplit[:-1])
-                        spell_level = spellLevelTextSplit[-1]
+                    spellLevelText = attributes.get('atr2', '')
+                    spellLevelTextSplit = spellLevelText.split()
+                    spellSchool = ' '.join(spellLevelTextSplit[:-1])
+                    spellLevel = spellLevelTextSplit[-1]
                 elif p.name == 'p' and 'level' in p.get_text():
-                        spellLevelText = attributes.get('atr2', '')
-                        spellLevelTextSplit = spellLevelText.split( )
-                        spell_school = ' '.join(spellLevelText[:0])
-                        spell_level = parts[0]
+                    spellLevelText = attributes.get('atr2', '')
+                    spellLevelTextSplit = spellLevelText.split(' ', 1)
+                    if len(spellLevelTextSplit) >= 2:
+                        spellLevel = spellLevelTextSplit[0]
+                        spellSchool = spellLevelTextSplit[1]
             # Create the description (excluding spell lists)
             spell_description = "\n".join(
                 attributes.get(f'atr{i}', '') for i in range(7, attr_index) if 'Spell Lists' not in attributes.get(f'atr{i}', '')
@@ -94,8 +98,8 @@ class Command(BaseCommand):
             components   = attributes.get('atr5', '')
             duration     = attributes.get('atr6', '')
 
-            print(f"spell school: {spell_school}")
-            print(f"sepll level: {spell_level}")
+            print(f"spell school: {spellSchool}")
+            print(f"spell level: {spellLevel}")
 
 #            # Create or update the spell
 #            spell = Spell(
