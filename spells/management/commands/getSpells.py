@@ -76,7 +76,7 @@ class Command(BaseCommand):
             
             for p in spellBody:
                 if p.name == 'p' and 'cantrip' in p.get_text():
-                    spellLevelText = attributes.get('atr2', '')
+                   spellLevelText = attributes.get('atr2', '')
                     spellLevelTextSplit = spellLevelText.split()
                     spellSchool = ' '.join(spellLevelTextSplit[:-1])
                     spellLevel = spellLevelTextSplit[-1]
