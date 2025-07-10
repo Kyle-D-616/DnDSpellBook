@@ -70,22 +70,22 @@ class Command(BaseCommand):
                 if p.name == 'p' and 'Spell Lists' in p.get_text():
                     text = p.get_text(strip=True).replace("Spell Lists.", "").replace("Spell Lists:","").replace(" (Optional)", "")
                     spell_lists.update(s.strip() for s in text.split(","))
+
             #Extract spell level and spell type
-            spellSchool = ''
-            spellLevel = ''
-            
+            spell_school = ''
+            spell_level = ''
             for p in spellBody:
                 if p.name == 'p' and 'cantrip' in p.get_text():
-                   spellLevelText = attributes.get('atr2', '')
+                    spellLevelText = attributes.get('atr2', '')
                     spellLevelTextSplit = spellLevelText.split()
-                    spellSchool = ' '.join(spellLevelTextSplit[:-1])
-                    spellLevel = spellLevelTextSplit[-1]
+                    spell_school = ' '.join(spellLevelTextSplit[:-1])
+                    spell_level = spellLevelTextSplit[-1]
                 elif p.name == 'p' and 'level' in p.get_text():
                     spellLevelText = attributes.get('atr2', '')
                     spellLevelTextSplit = spellLevelText.split(' ', 1)
                     if len(spellLevelTextSplit) >= 2:
-                        spellLevel = spellLevelTextSplit[0]
-                        spellSchool = spellLevelTextSplit[1]
+                        spell_level = spellLevelTextSplit[0]
+                        spell_school = spellLevelTextSplit[1]
             # Create the description (excluding spell lists)
             spell_description = "\n".join(
                 attributes.get(f'atr{i}', '') for i in range(7, attr_index) if 'Spell Lists' not in attributes.get(f'atr{i}', '')
@@ -93,27 +93,25 @@ class Command(BaseCommand):
 
             # Convert attributes dict into structured fields
             spell_source = attributes.get('atr1', '')
-            casting_time = attributes.get('atr3', '')
-            spell_range  = attributes.get('atr4', '')
-            components   = attributes.get('atr5', '')
-            duration     = attributes.get('atr6', '')
+            casting_time = attributes.get('atr3', '').replace("Casting Time:", "").strip()
+            spell_range  = attributes.get('atr4', '').replace("Range:","").strip()
+            components   = attributes.get('atr5', '').replace("Components:","").strip()
+            duration     = attributes.get('atr6', '').replace("Duration:","").strip()
 
-            print(f"spell school: {spellSchool}")
-            print(f"spell level: {spellLevel}")
-
-#            # Create or update the spell
-#            spell = Spell(
-#                name=spellName,
-#                source=spell_source,
-#                spellLevelType=spell_level,
-#                castingTime=casting_time,
-#                spellRange=spell_range,
-#                components=components,
-#                duration=duration,
-#                description=spell_description,
-#            )
-#
-#            # Save the spell to the database
+            # create or update the spell
+            spell = Spell2014(
+                name=spellName,
+                source=spell_source,
+                spellLevel=spell_level,
+                spellSchool=spell_school,
+                castingtime=casting_time,
+                spellRange=spell_range,
+                components=components,
+                duration=duration,
+                description=spell_description,
+            )
+            print(spell)
+            # save the spell to the database
 #            spell.save()
 #
 #            list_objs = []
@@ -121,11 +119,11 @@ class Command(BaseCommand):
 #                list_name = list_name.strip()
 #                if not list_name:
 #                    continue
-#                spell_list_obj, _ = SpellList.objects.get_or_create(name=list_name)
+#                spell_list_obj, _ = spelllist.objects.get_or_create(name=list_name)
 #                list_objs.append(spell_list_obj)
 #
-#            spell.spellList.set(list_objs)
+#            spell.spelllist.set(list_objs)
 #
-#            self.stdout.write(self.style.SUCCESS(f"Successfully added spell '{spellName}'"))
+#            self.stdout.write(self.style.success(f"successfully added spell '{spellname}'"))
 #
-#        self.stdout.write(self.style.SUCCESS('Successfully updated the database with new spells'))
+#        self.stdout.write(self.style.success('successfully updated the database with new spells'))
