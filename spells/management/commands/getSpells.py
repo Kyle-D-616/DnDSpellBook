@@ -3,7 +3,7 @@ import django
 from requests_html import HTMLSession
 from bs4 import BeautifulSoup
 from django.core.management.base import BaseCommand
-from spells.models import Spell2014#, SpellList
+from spells.models import Spell2014, SpellList2014
 
 # Set up Django environment
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "DnDSpellBook.settings")
@@ -32,9 +32,9 @@ class Command(BaseCommand):
             spellName = spellDiv.find('span').get_text(strip=True)
 
             # Check if the spell already exists in the database
-#            if Spell.objects.filter(name=spellName).exists():
- #               self.stdout.write(self.style.SUCCESS(f"Spell '{spellName}' already exists, skipping..."))
-  #              continue  # Skip to the next spell if it already exists
+            if Spell2014.objects.filter(name=spellName).exists():
+                self.stdout.write(self.style.SUCCESS(f"Spell '{spellName}' already exists, skipping..."))
+                continue  # Skip to the next spell if it already exists
 
             # Spell body
             spellBodyDiv = soup.find('div', {'id': 'page-content'})
@@ -76,19 +76,16 @@ class Command(BaseCommand):
             #Extract spell level and spell type
             spell_school = ''
             spell_level = ''
-            for p in spellBody:
-                if p.name == 'p' and 'cantrip' in p.get_text():
-                    spellLevelText = attributes.get('atr2', '')
-                    spellLevelTextSplit = spellLevelText.split()
-                    spell_school = ' '.join(spellLevelTextSplit[:-1])
-                    spell_level = spellLevelTextSplit[-1]
-                elif p.name == 'p' and 'level' in p.get_text():
-                    spellLevelText = attributes.get('atr2', '')
-                    spellLevelTextSplit = spellLevelText.split(' ', 1)
-                    if len(spellLevelTextSplit) >= 2:
-                        spell_level = spellLevelTextSplit[0]
-                        spell_school = spellLevelTextSplit[1]
-            # Create the description (excluding spell lists)
+            spellLevelTypeText = attributes.get('atr2', '')
+            if "cantrip" in spellLevelTypeText.lower():
+                parts = spellLevelTypeText.split()
+                spell_school = ' '.join(parts[:-1])
+                spell_level = parts[-1]
+            else:
+                parts = spellLevelTypeText.split(' ', 1)
+                spell_level = parts[0]
+                spell_school = parts[1] if len(parts) > 1 else ''
+            #Create the description (excluding spell lists)
             spell_description = "\n".join(
                 attributes.get(f'atr{i}', '') for i in range(7, attr_index) if 'Spell Lists' not in attributes.get(f'atr{i}', '')
             )
@@ -112,20 +109,20 @@ class Command(BaseCommand):
                 duration=duration,
                 description=spell_description,
             )
-            print(vars(spell))
+            #print(vars(spell))
             # save the spell to the database
-#            spell.save()
-#
-#            list_objs = []
-#            for list_name in spell_lists:
-#                list_name = list_name.strip()
-#                if not list_name:
-#                    continue
-#                spell_list_obj, _ = spelllist.objects.get_or_create(name=list_name)
-#                list_objs.append(spell_list_obj)
-#
-#            spell.spelllist.set(list_objs)
-#
-#            self.stdout.write(self.style.success(f"successfully added spell '{spellname}'"))
-#
-#        self.stdout.write(self.style.success('successfully updated the database with new spells'))
+            spell.save()
+
+            list_objs = []
+            for list_name in spell_lists:
+                list_name = list_name.strip()
+                if not list_name:
+                    continue
+                spell_list_obj, _ = SpellList2014.objects.get_or_create(name=list_name)
+                list_objs.append(spell_list_obj)
+
+            spell.spellList.set(list_objs)
+
+            self.stdout.write(self.style.SUCCESS(f"successfully added spell '{spellName}'"))
+
+        self.stdout.write(self.style.SUCCESS('successfully updated the database with new spells'))
