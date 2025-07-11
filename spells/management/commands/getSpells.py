@@ -48,7 +48,7 @@ class Command(BaseCommand):
                 if p.name == 'p':  # If it's a <p> tag, process it as a paragraph
                     # Replace <br> tags with a unique placeholder
                     for br in p.find_all('br'):
-                        br.replace_with('|')  
+                        br.replace_with('|')
 
                     # Split text by the placeholder
                     parts = p.get_text(strip=True).split('|')
@@ -70,7 +70,9 @@ class Command(BaseCommand):
                 if p.name == 'p' and 'Spell Lists' in p.get_text():
                     text = p.get_text(strip=True).replace("Spell Lists.", "").replace("Spell Lists:","").replace(" (Optional)", "")
                     spell_lists.update(s.strip() for s in text.split(","))
-
+            
+            print(f"spell name: {spellName}")
+            print(f"attribute 2 text: '{attributes.get('atr2', '')}'")
             #Extract spell level and spell type
             spell_school = ''
             spell_level = ''
@@ -92,7 +94,7 @@ class Command(BaseCommand):
             )
 
             # Convert attributes dict into structured fields
-            spell_source = attributes.get('atr1', '')
+            spell_source = attributes.get('atr1', '').replace("Source:", "").strip()
             casting_time = attributes.get('atr3', '').replace("Casting Time:", "").strip()
             spell_range  = attributes.get('atr4', '').replace("Range:","").strip()
             components   = attributes.get('atr5', '').replace("Components:","").strip()
@@ -104,13 +106,13 @@ class Command(BaseCommand):
                 source=spell_source,
                 spellLevel=spell_level,
                 spellSchool=spell_school,
-                castingtime=casting_time,
+                castingTime=casting_time,
                 spellRange=spell_range,
                 components=components,
                 duration=duration,
                 description=spell_description,
             )
-            print(spell)
+            print(vars(spell))
             # save the spell to the database
 #            spell.save()
 #
