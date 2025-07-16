@@ -71,9 +71,6 @@ class Command(BaseCommand):
                     text = p.get_text(strip=True).replace("Spell Lists.", "").replace("Spell Lists:","").replace(" (Optional)", "")
                     spell_lists.update(s.strip() for s in text.split(","))
 
-            print(f"spell name: {spellName}")
-            print(f"attribute 2 text: '{attributes.get('atr2', '')}'")
-
             #Extract spell level and spell type
             spell_school = ''
             spell_level = ''
