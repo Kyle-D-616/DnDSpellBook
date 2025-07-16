@@ -66,9 +66,6 @@ class Command(BaseCommand):
                         match = re.search(r'\((.*?)\)', em.get_text(strip=True))
                         if match:
                             spell_lists.update(s.strip() for s in match.group(1).split(","))
-            
-            print(f"spell name: {spellName}")
-            print(f"attribute 2 text: '{attributes.get('atr2', '')}'")
 
             #extract spell level and spell type
             spell_school = ''
@@ -76,12 +73,12 @@ class Command(BaseCommand):
             spellLevelTypeText = attributes.get('atr2', '')
             if "cantrip" in spellLevelTypeText.lower():
                 parts = spellLevelTypeText.split()
-                spell_school = ' '.join(parts[:-1])
-                spell_level = parts[-1]
+                spell_school = ' '.join(parts[:1])
+                spell_level = parts[1]
             else:
-                parts = spellLevelTypeText.split(' ', 1)
-                spell_level = parts[0]
-                spell_school = parts[1] if len(parts) > 1 else ''
+                parts = spellLevelTypeText.split(' ', 3)
+                spell_level = parts[0]+' '+parts[1]
+                spell_school = parts[2] if len(parts) > 1 else ''
  
             # Create the description (excluding spell lists)
             spell_description = "\n".join(
