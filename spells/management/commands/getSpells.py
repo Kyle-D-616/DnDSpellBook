@@ -12,29 +12,13 @@ class Command(BaseCommand):
 
     def handle(self, *args, **kwargs):
         session = HTMLSession()
-        version = int(input("Which version: [1] 2024, [2] 2014 "))
-        if version == 1:
-            baseUrl = 'http://dnd2024.wikidot.com/spell:all'
-        else:
-            baseUrl = 'https://dnd5e.wikidot.com/spells'
-        urlResponse = session.get(baseUrl)
-        soup = BeautifulSoup(urlResponse.content, 'html.parser')
-        table = soup.find('table')
-        spellUrls = []
-        for url in table.find_all('a'):
-            spellUrls.append('https://dnd5e.wikidot.com' + url.get('href'))
+        version = int(input("Which version: [1] 2014, [2] 2024"))
+               urlResponse = session.get(baseUrl)
+
         for spellUrl in spellUrls:
-            urlResponse = session.get(spellUrl)
-            soup = BeautifulSoup(urlResponse.content, 'html.parser')
             # Spell name
             spellDiv = soup.find('div', {'class': 'page-title page-header'})
             spellName = spellDiv.find('span').get_text(strip=True)
-
-            # Check if the spell already exists in the database
-            if Spell2014.objects.filter(name=spellName).exists():
-                self.stdout.write(self.style.SUCCESS(f"Spell '{spellName}' already exists, skipping..."))
-                continue  # Skip to the next spell if it already exists
-
             # Spell body
             spellBodyDiv = soup.find('div', {'id': 'page-content'})
             spellBody = spellBodyDiv.find_all(['p', 'ul'])  # Now include <ul> elements
