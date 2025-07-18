@@ -17,9 +17,9 @@ class Spell(models.Model):
     duration = models.CharField(max_length=50, blank=True, null=True)
     description = models.TextField(blank=True, null=True)
     version = models.CharField(max_length=50)
-    spellKey = models.charField(max_length=50, unique=True)
+    spellKey = models.CharField(max_length=50, unique=True)
 
-    spellList = models.ManyToManyField(SpellList2014)
+    spellList = models.ManyToManyField(SpellList)
 
     def __str__(self):
         return self.name

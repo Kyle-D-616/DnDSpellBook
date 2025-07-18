@@ -16,10 +16,7 @@ class Command(BaseCommand):
                urlResponse = session.get(baseUrl)
 
         for spellUrl in spellUrls:
-            # Spell name
-            spellDiv = soup.find('div', {'class': 'page-title page-header'})
-            spellName = spellDiv.find('span').get_text(strip=True)
-            # Spell body
+           # Spell body
             spellBodyDiv = soup.find('div', {'id': 'page-content'})
             spellBody = spellBodyDiv.find_all(['p', 'ul'])  # Now include <ul> elements
 

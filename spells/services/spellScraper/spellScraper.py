@@ -8,8 +8,8 @@ class SpellScraper:
         self.spellUrls = []
         self.version = version
 
-    def getSpellUrls(self,baseUrl):
-        if self.version == 2:
+    def getSpellUrls(self, baseUrl):
+        if self.version == 2014:
             baseUrl = 'https://dnd5e.wikidot.com/spells'
         else:
             baseUrl = 'http://dnd2024.wikidot.com/spell:all'
@@ -21,15 +21,16 @@ class SpellScraper:
 
     def getSpellData(self, spellUrls):
         for spellUrl in self.spellUrls:
-            response = self.session.getSpellUrls(spellUrl)
+            response = self.session.get(spellUrl)
             soup = BeautifulSoup(response.content, 'html.parser')
             #make name then make spell key to do check
-
-
-
+            # Spell name
+            spellDiv = soup.find('div', {'class': 'page-title page-header'})
+            spellName = spellDiv.find('span').get_text(strip=True)
+            spellKey = str(self.version) + spellName.replace(" ", "")
+            print(spellKey)
         # Check if the spell already exists in the database
-        if Spells.objects.filter(name=spellName).exists():
-            self.stdout.write(self.style.SUCCESS(f"Spell '{spellName}' already exists, skipping..."))
-            continue  # Skip to the next spell if it already exists
-
-
+#        if Spells.objects.filter(name=spellName).exists():
+#            self.stdout.write(self.style.SUCCESS(f"Spell '{spellName}' already exists, skipping..."))
+#            continue  # Skip to the next spell if it already exists
+#

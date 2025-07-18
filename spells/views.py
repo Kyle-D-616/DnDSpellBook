@@ -1,5 +1,5 @@
 from django.shortcuts import render
-from .models import Spell2014, SpellList2014, Spell2024, SpellList2024
+from .models import Spell, SpellList
 
 
 def spellList(request):
