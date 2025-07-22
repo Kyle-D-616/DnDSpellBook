@@ -6,7 +6,7 @@ class SpellList(models.Model):
     def __str__(self):
         return self.name
 
-class Spell(models.Model):
+class Spells(models.Model):
     name = models.CharField(max_length=255)
     source = models.CharField(max_length=255, blank=True, null=True)
     spellLevel = models.CharField(max_length=255, blank=True, null=True)
