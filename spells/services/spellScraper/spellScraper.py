@@ -105,8 +105,10 @@ class SpellScraper:
             spell_body_elements = parser.get_spell_body_elements()
             extractor = AttributeExtractor()
             attributes = extractor.process_spell_body(spell_body_elements)
+            
+            print(f"Spell: {spell_name}")
+            print(f"Spell Key: {spell_key}")
+            print(f"Attributes: {attributes}")
+            print("=" * 50)
 
             # TODO: Save spell data to database using attributes
-
-
-
