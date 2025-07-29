@@ -27,7 +27,7 @@ def test_spell_scraper():
     
     # Call getSpellData to process all URLs
     print("Processing all spells...")
-    scraper.getSpellData(None)
+    scraper.getSpellData()
     print("Test completed!")
 
 if __name__ == "__main__":

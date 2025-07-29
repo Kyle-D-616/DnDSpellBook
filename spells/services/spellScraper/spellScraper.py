@@ -17,13 +17,14 @@ class SpellParser:
         spell_body_div = self.soup.find('div', {'id': 'page-content'})
         return spell_body_div.find_all(['p', 'ul'])
 
-    def get_spell_lists(self, spell_body_div):
-        for p in spell_body_div:
+    def get_spell_lists(self, spell_body_elements):
+        for p in spell_body_elements:
             if p.name == 'p':
                 for em in p.find_all('em'):
                     match = re.search(r'\((.*?)\)', em.get_text(strip=True))
                     if match:
-                        self.spell_lists.update(s.strip() for s in match.group(1).split(","))
+                        self.spell_list.update(s.strip() for s in match.group(1).split(","))
+        return self.spell_list
 
 
 class SpellValidator:
@@ -67,6 +68,45 @@ class AttributeExtractor:
         return self.attributes
 
 
+class SpellDataMapper:
+    def __init__(self, attributes, version):
+        self.attributes = attributes
+        self.version = version
+
+    def map_to_spell_fields(self):
+        # Extract spell level and spell school from atr2
+        spell_school = ''
+        spell_level = ''
+        spell_level_type_text = self.attributes.get('atr2', '')
+
+        if "cantrip" in spell_level_type_text.lower():
+            parts = spell_level_type_text.split()
+            spell_school = ' '.join(parts[:1])  # Just the first part (e.g., "Evocation")
+            spell_level = parts[1]  # Second part (e.g., "Cantrip")
+        else:
+            parts = spell_level_type_text.split(' ', 3)
+            spell_level = parts[0] + ' ' + parts[1]  # e.g., "1st Level"
+            spell_school = parts[2] if len(parts) > 2 else ''
+
+        # Create description (excluding spell lists)
+        spell_description = "\n".join(
+            self.attributes.get(f'atr{i}', '') for i in range(7, len(self.attributes) + 1) 
+            if 'Spell Lists' not in self.attributes.get(f'atr{i}', '')
+        )
+
+        return {
+            'source': self.attributes.get('atr1', '').replace("Source:", "").strip(),
+            'spellLevel': spell_level,
+            'spellSchool': spell_school,
+            'castingTime': self.attributes.get('atr3', '').replace("Casting Time:", "").strip(),
+            'spellRange': self.attributes.get('atr4', '').replace("Range:", "").strip(),
+            'components': self.attributes.get('atr5', '').replace("Components:", "").strip(),
+            'duration': self.attributes.get('atr6', '').replace("Duration:", "").strip(),
+            'description': spell_description,
+            'version': str(self.version)
+        }
+
+
 class SpellScraper:
 
     def __init__(self, version):
@@ -89,8 +129,9 @@ class SpellScraper:
                 else:
                     self.spellUrls.append('http://dnd2024.wikidot.com' + url.get('href'))
 
-    def getSpellData(self, spellUrls):
+    def getSpellData(self):
         for spellUrl in self.spellUrls:
+            print(f"Processing: {spellUrl}")
             response = self.session.get(spellUrl)
             soup = BeautifulSoup(response.content, 'html.parser')
 
@@ -103,12 +144,19 @@ class SpellScraper:
                 continue
 
             spell_body_elements = parser.get_spell_body_elements()
+            spell_lists = parser.get_spell_lists(spell_body_elements)
+
             extractor = AttributeExtractor()
             attributes = extractor.process_spell_body(spell_body_elements)
-            
+
+            mapper = SpellDataMapper(attributes, self.version)
+            spell_fields = mapper.map_to_spell_fields()
+
             print(f"Spell: {spell_name}")
             print(f"Spell Key: {spell_key}")
-            print(f"Attributes: {attributes}")
+            print(f"Spell Lists: {spell_lists}")
+            print(f"Raw Attributes: {attributes}")
+            print(f"Mapped Fields: {spell_fields}")
             print("=" * 50)
 
             # TODO: Save spell data to database using attributes
