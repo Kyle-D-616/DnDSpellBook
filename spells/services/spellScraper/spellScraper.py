@@ -129,6 +129,11 @@ class SpellScraper:
                 else:
                     self.spellUrls.append('http://dnd2024.wikidot.com' + url.get('href'))
 
+class SpellSaver:
+
+    def __init__(self, spell):
+        self.spell = spell
+
     def getSpellData(self):
         for spellUrl in self.spellUrls:
             print(f"Processing: {spellUrl}")
