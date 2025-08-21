@@ -106,18 +106,18 @@ class Command(BaseCommand):
             )
             print(vars(spell))
             # save the spell to the database
-            # spell.save()
+             spell.save()
 
-#            list_objs = []
-#            for list_name in spell_lists:
-#                list_name = list_name.strip()
-#                if not list_name:
-#                    continue
-#                spell_list_obj, _ = SpellList2024.objects.get_or_create(name=list_name)
-#                list_objs.append(spell_list_obj)
-#
-#            spell.spellList.set(list_objs)
-#
-#            self.stdout.write(self.style.SUCCESS(f"Successfully added spell '{spellName}'"))
-#
-#        self.stdout.write(self.style.SUCCESS('Successfully updated the database with new spells'))
+            list_objs = []
+            for list_name in spell_lists:
+                list_name = list_name.strip()
+                if not list_name:
+                    continue
+                spell_list_obj, _ = spelllist2024.objects.get_or_create(name=list_name)
+                list_objs.append(spell_list_obj)
+
+            spell.spelllist.set(list_objs)
+
+            self.stdout.write(self.style.SUCCESS(f"Successfully added spell '{spellName}'"))
+
+        self.stdout.write(self.style.SUCCESS('Successfully updated the database with new spells'))
