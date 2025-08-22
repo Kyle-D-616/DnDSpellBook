@@ -2,6 +2,7 @@ from requests_html import HTMLSession
 from bs4 import BeautifulSoup
 import re
 from spells.models import Spells, SpellList
+from spells.services.spellSaver import WriteSpellToDataBase
 
 
 class SpellParser:
@@ -26,35 +27,24 @@ class SpellParser:
                         self.spell_list.update(s.strip() for s in match.group(1).split(","))
         return self.spell_list
 
-
 class SpellValidator:
     @staticmethod
     def spell_exists(spell_key):
-        return Spells.objects.filter(name=spell_key).exists()
+        return Spells.objects.filter(spellKey=spell_key).exists()  # check spellKey
 
     @staticmethod
     def generate_spell_key(version, spell_name):
         return str(version) + spell_name.replace(" ", "").replace("'", "")
-
-
-class AttributeExtractor:
-    def __init__(self):
-        self.attributes = {}
-        self.attr_index = 1
-
     def extract_from_paragraph(self, p_element):
         for br in p_element.find_all('br'):
             br.replace_with('|')
-
         parts = p_element.get_text(strip=True).split('|')
-
         for part in parts:
             self.attributes[f'atr{self.attr_index}'] = part.strip()
             self.attr_index += 1
 
     def extract_from_list(self, ul_element):
-        list_items = ul_element.find_all('li')
-        for item in list_items:
+        for item in ul_element.find_all('li'):
             self.attributes[f'atr{self.attr_index}'] = item.get_text(strip=True)
             self.attr_index += 1
 
@@ -64,7 +54,6 @@ class AttributeExtractor:
                 self.extract_from_paragraph(element)
             elif element.name == 'ul':
                 self.extract_from_list(element)
-
         return self.attributes
 
 
@@ -73,28 +62,29 @@ class SpellDataMapper:
         self.attributes = attributes
         self.version = version
 
-    def map_to_spell_fields(self):
-        # Extract spell level and spell school from atr2
+    def map_to_spell_fields(self, spell_name, spell_lists):
+        # Handle spell level and school
         spell_school = ''
         spell_level = ''
         spell_level_type_text = self.attributes.get('atr2', '')
 
         if "cantrip" in spell_level_type_text.lower():
             parts = spell_level_type_text.split()
-            spell_school = ' '.join(parts[:1])  # Just the first part (e.g., "Evocation")
-            spell_level = parts[1]  # Second part (e.g., "Cantrip")
+            spell_school = ' '.join(parts[:1])
+            spell_level = parts[1]
         else:
             parts = spell_level_type_text.split(' ', 3)
-            spell_level = parts[0] + ' ' + parts[1]  # e.g., "1st Level"
+            spell_level = parts[0] + ' ' + parts[1]
             spell_school = parts[2] if len(parts) > 2 else ''
 
-        # Create description (excluding spell lists)
+        # Build description text (ignoring spell list lines)
         spell_description = "\n".join(
-            self.attributes.get(f'atr{i}', '') for i in range(7, len(self.attributes) + 1) 
+            self.attributes.get(f'atr{i}', '') for i in range(7, len(self.attributes) + 1)
             if 'Spell Lists' not in self.attributes.get(f'atr{i}', '')
         )
 
         return {
+            'name': spell_name,
             'source': self.attributes.get('atr1', '').replace("Source:", "").strip(),
             'spellLevel': spell_level,
             'spellSchool': spell_school,
@@ -103,41 +93,39 @@ class SpellDataMapper:
             'components': self.attributes.get('atr5', '').replace("Components:", "").strip(),
             'duration': self.attributes.get('atr6', '').replace("Duration:", "").strip(),
             'description': spell_description,
-            'version': str(self.version)
+            'version': str(self.version),
+            'spellLists': list(spell_lists)
         }
 
 
 class SpellScraper:
-
     def __init__(self, version):
         self.session = HTMLSession()
-        self.spellUrls = []
         self.version = version
+        self.spellUrls = []
 
-    def getSpellUrls(self, baseUrl):
-        if self.version == 2014:
-            baseUrl = 'https://dnd5e.wikidot.com/spells'
-        else:
-            baseUrl = 'http://dnd2024.wikidot.com/spell:all'
-        response = self.session.get(baseUrl)
+    def get_spell_urls(self):
+        base_url = (
+            'https://dnd5e.wikidot.com/spells'
+            if self.version == 2014
+            else 'http://dnd2024.wikidot.com/spell:all'
+        )
+        response = self.session.get(base_url)
         soup = BeautifulSoup(response.content, 'html.parser')
-        tables = soup.find_all('table')
-        for table in tables:
+
+        for table in soup.find_all('table'):
             for url in table.find_all('a'):
-                if self.version == 2014:
-                    self.spellUrls.append('https://dnd5e.wikidot.com' + url.get('href'))
-                else:
-                    self.spellUrls.append('http://dnd2024.wikidot.com' + url.get('href'))
+                full_url = (
+                    'https://dnd5e.wikidot.com' + url.get('href')
+                    if self.version == 2014
+                    else 'http://dnd2024.wikidot.com' + url.get('href')
+                )
+                self.spellUrls.append(full_url)
 
-class SpellSaver:
-
-    def __init__(self, spell):
-        self.spell = spell
-
-    def getSpellData(self):
-        for spellUrl in self.spellUrls:
-            print(f"Processing: {spellUrl}")
-            response = self.session.get(spellUrl)
+    def process_spells(self):
+        for spell_url in self.spellUrls:
+            print(f"Processing: {spell_url}")
+            response = self.session.get(spell_url)
             soup = BeautifulSoup(response.content, 'html.parser')
 
             parser = SpellParser(soup)
@@ -155,13 +143,12 @@ class SpellSaver:
             attributes = extractor.process_spell_body(spell_body_elements)
 
             mapper = SpellDataMapper(attributes, self.version)
-            spell_fields = mapper.map_to_spell_fields()
+            spell_fields = mapper.map_to_spell_fields(spell_name, spell_lists)
 
-            print(f"Spell: {spell_name}")
-            print(f"Spell Key: {spell_key}")
-            print(f"Spell Lists: {spell_lists}")
-            print(f"Raw Attributes: {attributes}")
+            print(f"Saving Spell: {spell_name}")
             print(f"Mapped Fields: {spell_fields}")
             print("=" * 50)
 
-            # TODO: Save spell data to database using attributes
+            saver = WriteSpellToDataBase(spell_fields)
+            saver.save_spell_to_database()
+

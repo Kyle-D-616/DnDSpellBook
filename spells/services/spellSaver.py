@@ -1,33 +1,33 @@
-from .models import Spells, SpellList
+from spells.models import Spells, SpellList
 
-class SpellSaver:
+class WriteSpellToDataBase:
 
-    def __init__(self, spellData):
-        self.spellData = spellData
+    def __init__(self, spell_fields):
+        self.spell_fields = spell_fields
 
     def save_spell_to_database(self):
         spell = Spells(
-            name=self.spellData['name'],
-            source=self.spellData['source'],
-            spellLevel=self.spellData['spellLevel'],
-            spellSchool=self.spellData['spellSchool'],
-            castingTime=self.spellData['castingTime'],
-            spellRange=self.spellData['spellRange'],
-            components=self.spellData['components'],
-            duration=self.spellData['duration'],
-            description=self.spellData['description'],
+            name=self.spell_fields['name'],
+            source=self.spell_fields['source'],
+            spellLevel=self.spell_fields['spellLevel'],
+            spellSchool=self.spell_fields['spellSchool'],
+            castingTime=self.spell_fields['castingTime'],
+            spellRange=self.spell_fields['spellRange'],
+            components=self.spell_fields['components'],
+            duration=self.spell_fields['duration'],
+            description=self.spell_fields['description'],
         )
 
         spell.save()
 
         list_objs = []
-        for list_name in self.spellData.get('spellLists',[]):
+        for list_name in self.spell_fields.get('spellLists', []):
             list_name = list_name.strip()
             if not list_name:
                 continue
             spell_list_obj, _ = SpellList.objects.get_or_create(name=list_name)
             list_objs.append(spell_list_obj)
 
-        spell.spelllist.set(list_objs)
+        spell.spellList.set(list_objs)
 
         return spell
