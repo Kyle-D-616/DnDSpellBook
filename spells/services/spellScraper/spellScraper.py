@@ -2,8 +2,6 @@ from requests_html import HTMLSession
 from bs4 import BeautifulSoup
 import re
 from spells.models import Spells, SpellList
-from spells.services.spellSaver import WriteSpellToDataBase
-
 
 class SpellParser:
     def __init__(self, soup):
@@ -27,14 +25,22 @@ class SpellParser:
                         self.spell_list.update(s.strip() for s in match.group(1).split(","))
         return self.spell_list
 
+
 class SpellValidator:
     @staticmethod
     def spell_exists(spell_key):
-        return Spells.objects.filter(spellKey=spell_key).exists()  # check spellKey
+        return Spells.objects.filter(spellKey=spell_key).exists()
 
     @staticmethod
     def generate_spell_key(version, spell_name):
         return str(version) + spell_name.replace(" ", "").replace("'", "")
+
+
+class AttributeExtractor:
+    def __init__(self):
+        self.attributes = {}
+        self.attr_index = 1
+
     def extract_from_paragraph(self, p_element):
         for br in p_element.find_all('br'):
             br.replace_with('|')
@@ -99,10 +105,11 @@ class SpellDataMapper:
 
 
 class SpellScraper:
-    def __init__(self, version):
+    def __init__(self, version, database_writer_class=None):
         self.session = HTMLSession()
         self.version = version
         self.spellUrls = []
+        self.database_writer_class = database_writer_class
 
     def get_spell_urls(self):
         base_url = (
@@ -149,6 +156,5 @@ class SpellScraper:
             print(f"Mapped Fields: {spell_fields}")
             print("=" * 50)
 
-            saver = WriteSpellToDataBase(spell_fields)
+            saver = self.database_writer_class(spell_fields)
             saver.save_spell_to_database()
-
