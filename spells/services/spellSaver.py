@@ -2,6 +2,8 @@ from spells.models import Spells, SpellList
 
 class WriteSpellToDataBase:
     def __init__(self, spell_fields):
+        if not spell_fields or not isinstance(spell_fields, dict):
+            raise ValueError("spell_fields must be a valid dictionary")
         self.spell_fields = spell_fields
     
     def save_spell_to_database(self):

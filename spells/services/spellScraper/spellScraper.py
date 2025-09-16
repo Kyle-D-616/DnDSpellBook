@@ -17,12 +17,55 @@ class SpellParser:
         return spell_body_div.find_all(['p', 'ul'])
 
     def get_spell_lists(self, spell_body_elements):
-        for p in spell_body_elements:
-            if p.name == 'p':
-                for em in p.find_all('em'):
-                    match = re.search(r'\((.*?)\)', em.get_text(strip=True))
-                    if match:
-                        self.spell_list.update(s.strip() for s in match.group(1).split(","))
+        # Define what are actual class names vs other terms
+        valid_classes = {
+            'artificer', 'bard', 'cleric', 'druid', 'paladin', 'ranger', 
+            'sorcerer', 'warlock', 'wizard'
+        }
+        
+        for element in spell_body_elements:
+            if element.name == 'p':
+                element_text = element.get_text()
+                
+                # 2024 format: Level X School (Class1, Class2)
+                # Look in em tags for parentheses with class names
+                # BUT only if it starts with "Level" (not "1st-level" which is 2014 format)
+                for em in element.find_all('em'):
+                    em_text = em.get_text(strip=True)
+                    # Only process if it starts with "Level" (2024 format)
+                    if em_text.startswith('Level'):
+                        paren_match = re.search(r'\(([^)]+)\)', em_text)
+                        if paren_match:
+                            classes_text = paren_match.group(1)
+                            # Split by comma and clean up
+                            classes = [cls.strip() for cls in classes_text.split(',')]
+                            for cls in classes:
+                                # Only add if it's a valid class name
+                                if cls.lower() in valid_classes:
+                                    self.spell_list.add(cls)
+                
+                # 2014 format: "Spell Lists." followed by links or text
+                if 'Spell Lists' in element_text:
+                    # Extract text after "Spell Lists."
+                    spell_lists_text = element_text.split('Spell Lists.')[-1].strip()
+                    # Get the link text which contains the actual class names
+                    links = element.find_all('a')
+                    for link in links:
+                        class_name = link.get_text(strip=True)
+                        if class_name.lower() in valid_classes:
+                            self.spell_list.add(class_name)
+                    
+                    # Fallback: parse the text directly if no links
+                    if not links and spell_lists_text:
+                        # Split by common separators and clean
+                        for separator in [',', ';', ' and ', ' & ']:
+                            spell_lists_text = spell_lists_text.replace(separator, ',')
+                        
+                        for spell_list in spell_lists_text.split(','):
+                            cleaned = spell_list.strip(' .,')
+                            if cleaned.lower() in valid_classes:
+                                self.spell_list.add(cleaned)
+        
         return self.spell_list
 
 
@@ -75,13 +118,62 @@ class SpellDataMapper:
         spell_level_type_text = self.attributes.get('atr2', '')
 
         if "cantrip" in spell_level_type_text.lower():
-            parts = spell_level_type_text.split()
-            spell_school = ' '.join(parts[:1])
-            spell_level = parts[1]
+            # Format: "Conjuration cantrip" or "Conjuration cantrip (ritual)"
+            # Remove anything in parentheses first
+            clean_text = re.sub(r'\s*\([^)]*\)', '', spell_level_type_text).strip()
+            parts = clean_text.split()
+            if len(parts) >= 2:
+                spell_school = parts[0]  # "Conjuration"
+                spell_level = "Cantrip"
+            else:
+                spell_level = "Cantrip"
+                spell_school = clean_text if clean_text != "cantrip" else ''
+        elif spell_level_type_text.startswith('Level'):
+            # 2024 format: "Level 1 Abjuration (Ranger, Wizard)"
+            # Remove anything in parentheses first
+            clean_text = re.sub(r'\s*\([^)]*\)', '', spell_level_type_text).strip()
+            parts = clean_text.split()
+            if len(parts) >= 3:
+                spell_level = f"{parts[1]}{self._get_ordinal_suffix(parts[1])}-level"  # "1st-level"
+                spell_school = ' '.join(parts[2:])  # "Abjuration"
         else:
-            parts = spell_level_type_text.split(' ', 3)
-            spell_level = parts[0] + ' ' + parts[1]
-            spell_school = parts[2] if len(parts) > 2 else ''
+            # 2014 format: "1st-level divination" or "2nd-level abjuration (ritual)"
+            # Remove anything in parentheses first
+            clean_text = re.sub(r'\s*\([^)]*\)', '', spell_level_type_text).strip()
+            parts = clean_text.split()
+            
+            # Find where "-level" appears
+            level_part = ""
+            school_parts = []
+            found_level = False
+            
+            for part in parts:
+                if "-level" in part:
+                    level_part = part
+                    found_level = True
+                elif not found_level:
+                    level_part += (" " + part if level_part else part)
+                else:
+                    school_parts.append(part)
+            
+            if found_level:
+                spell_level = level_part
+                spell_school = ' '.join(school_parts)
+            else:
+                # Fallback
+                spell_level = spell_level_type_text
+                spell_school = ''
+    
+    def _get_ordinal_suffix(self, number_str):
+        """Convert number to ordinal suffix (1->st, 2->nd, 3->rd, etc)"""
+        try:
+            num = int(number_str)
+            if 10 <= num % 100 <= 20:
+                return "th"
+            else:
+                return {1: "st", 2: "nd", 3: "rd"}.get(num % 10, "th")
+        except:
+            return "th"
 
         # Build description text (ignoring spell list lines)
         spell_description = "\n".join(
