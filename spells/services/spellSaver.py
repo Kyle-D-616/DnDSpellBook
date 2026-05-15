@@ -16,6 +16,7 @@ class WriteSpellToDataBase:
             components=self.spell_fields['components'],
             duration=self.spell_fields['duration'],
             description=self.spell_fields['description'],
+            spellKey=self.spell_fields['spellKey']
         )
 
         spell.save()

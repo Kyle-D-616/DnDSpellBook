@@ -35,6 +35,14 @@ class SpellValidator:
     @staticmethod
     def generate_spell_key(version, spell_name):
         return str(version) + spell_name.replace(" ", "").replace("'", "")
+
+class AttributeExtractor():
+
+    def __init__(self, spell_body_elements):
+        self.spell_body_elements = spell_body_elements
+        self.attributes = {}
+        self.attr_index = 1
+
     def extract_from_paragraph(self, p_element):
         for br in p_element.find_all('br'):
             br.replace_with('|')
@@ -48,8 +56,8 @@ class SpellValidator:
             self.attributes[f'atr{self.attr_index}'] = item.get_text(strip=True)
             self.attr_index += 1
 
-    def process_spell_body(self, spell_body_elements):
-        for element in spell_body_elements:
+    def process_spell_body(self):
+        for element in self.spell_body_elements:
             if element.name == 'p':
                 self.extract_from_paragraph(element)
             elif element.name == 'ul':
@@ -85,6 +93,7 @@ class SpellDataMapper:
 
         return {
             'name': spell_name,
+            'spellKey': SpellValidator.generate_spell_key(self.version, spell_name),
             'source': self.attributes.get('atr1', '').replace("Source:", "").strip(),
             'spellLevel': spell_level,
             'spellSchool': spell_school,
@@ -139,8 +148,8 @@ class SpellScraper:
             spell_body_elements = parser.get_spell_body_elements()
             spell_lists = parser.get_spell_lists(spell_body_elements)
 
-            extractor = AttributeExtractor()
-            attributes = extractor.process_spell_body(spell_body_elements)
+            extractor = AttributeExtractor(spell_body_elements)
+            attributes = extractor.process_spell_body()
 
             mapper = SpellDataMapper(attributes, self.version)
             spell_fields = mapper.map_to_spell_fields(spell_name, spell_lists)
