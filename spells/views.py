@@ -1,50 +1,50 @@
 from django.shortcuts import render
-#from .models import Spell, SpellList
+#from .models import spell, spellList
 
 
 def spellList(request):
-    version = request.GET.get('version', '2024')
-    selectedSpellList = request.GET.getlist('spellList')
-    selectedSpells = request.session.get('selectedSpells', [])
+    version = request.get.get('version', '2024')
+    selectedspellList = request.get.getlist('spellList')
+    selectedspells = request.session.get('selectedspells', [])
 
-    if request.method == 'POST':
-        selectedSpellIds = request.POST.getlist('selectedSpells')
-        print(f"POST data: {selectedSpellIds}")
-        request.session['selectedSpells'] = [int(id) for id in selectedSpellIds]
-        request.session.modified = True
+    if request.method == 'post':
+        selectedspellids = request.post.getlist('selectedspells')
+        print(f"post data: {selectedspellids}")
+        request.session['selectedspells'] = [int(id) for id in selectedspellids]
+        request.session.modified = true
 
     if version == '2024':
-        spells = Spell2024.objects.all()
-        if selectedSpellList:
-            spells = spells.filter(spellList__name__in=selectedSpellList)
-        spellListOptions = SpellList2024.objects.all()
+        spells = Spells.objects.all()
+        if selectedspellList:
+            spells = spells.filter(spellList__name__in=selectedspellList)
+        spellListoptions = spellList2024.objects.all()
     else:
-        spells = Spell2014.objects.all()
-        if selectedSpellList:
-            spells = spells.filter(spellList__name__in=selectedSpellList)
-        spellListOptions = SpellList2014.objects.all()
+        spells = spell2014.objects.all()
+        if selectedspellList:
+            spells = spells.filter(spellList__name__in=selectedspellList)
+        spellListoptions = spellList2014.objects.all()
 
 
     return render(request, 'spells/spellList.html', {
         'version': version,
         'spells': spells,
-        'spellListOptions': spellListOptions,
-        'selectedList': selectedSpellList,
-        'selectedSpells': selectedSpells,
+        'spellListoptions': spellListoptions,
+        'selectedlist': selectedspellList,
+        'selectedspells': selectedspells,
     })
 
 def spellBook(request):
 
 
-    selectedSpellIds = request.session.get('selectedSpells')
-    spells2024 = Spell2024.objects.filter(id__in=selectedSpellIds)
-    spells2014 = Spell2014.objects.filter(id__in=selectedSpellIds)
+    selectedspellids = request.session.get('selectedspells')
+    spells2024 = spell2024.objects.filter(id__in=selectedspellids)
+    spells2014 = spell2014.objects.filter(id__in=selectedspellids)
 
     from itertools import chain
-    spellBookSpells = list(chain(spells2024, spells2014))
+    spellBookspells = list(chain(spells2024, spells2014))
     print("here are the spell id: ")
-    print(request.session.get('selectedSpells', []))
+    print(request.session.get('selectedspells', []))
 
     return render(request, 'spells/spellBook.html', {
-        'spellBookSpells': spellBookSpells,
+        'spellBookspells': spellBookspells,
     })
