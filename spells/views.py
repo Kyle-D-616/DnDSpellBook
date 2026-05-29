@@ -1,5 +1,5 @@
 from django.shortcuts import render
-#from .models import Spell, SpellList
+from .models import Spells, SpellList
 
 
 def spellList(request):
@@ -14,12 +14,12 @@ def spellList(request):
         request.session.modified = True
 
     if version == '2024':
-        spells = Spell2024.objects.all()
+        spells = Spells.objects.all()
         if selectedSpellList:
             spells = spells.filter(spellList__name__in=selectedSpellList)
-        spellListOptions = SpellList2024.objects.all()
+        spellListOptions = SpellList.objects.all()
     else:
-        spells = Spell2014.objects.all()
+        spells = Spell.objects.all()
         if selectedSpellList:
             spells = spells.filter(spellList__name__in=selectedSpellList)
         spellListOptions = SpellList2014.objects.all()
