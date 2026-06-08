@@ -14,15 +14,15 @@ def spellList(request):
         request.session.modified = True
 
     if version == '2024':
-        spells = Spells.objects.all()
+        spells = Spells.objects.filter(version='2024')
         if selectedSpellList:
             spells = spells.filter(spellList__name__in=selectedSpellList)
         spellListOptions = SpellList.objects.all()
     else:
-        spells = Spell.objects.all()
+        spells = Spells.objects.all()
         if selectedSpellList:
             spells = spells.filter(spellList__name__in=selectedSpellList)
-        spellListOptions = SpellList2014.objects.all()
+        spellListOptions = SpellList.objects.all()
 
 
     return render(request, 'spells/spellList.html', {
@@ -34,17 +34,8 @@ def spellList(request):
     })
 
 def spellBook(request):
-
-
-    selectedSpellIds = request.session.get('selectedSpells')
-    spells2024 = Spell2024.objects.filter(id__in=selectedSpellIds)
-    spells2014 = Spell2014.objects.filter(id__in=selectedSpellIds)
-
-    from itertools import chain
-    spellBookSpells = list(chain(spells2024, spells2014))
-    print("here are the spell id: ")
-    print(request.session.get('selectedSpells', []))
-
+    selectedSpellIds = request.session.get('selectedSpells', [])
+    spellBookSpells = Spells.objects.filter(id__in=selectedSpellIds)
     return render(request, 'spells/spellBook.html', {
         'spellBookSpells': spellBookSpells,
     })

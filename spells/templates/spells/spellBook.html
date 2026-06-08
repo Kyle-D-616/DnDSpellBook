@@ -1,11 +1,11 @@
 {% extends "base.html" %}
 
-{% block title %}Spell Book{% endblock %}
+{% block title %}spell book{% endblock %}
 
 {% block content %}
 <style>
     .spell-card.selected {
-        transform: translateY(-8px) scale(1.02);
+        transform: translatey(-8px) scale(1.02);
         box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
         border-color: #92400e;
         background: linear-gradient(to bottom, #fef3c7, #fde68a);
@@ -25,9 +25,9 @@
         background: linear-gradient(90deg, transparent, rgba(139, 69, 19, 0.3), transparent);
     }
 </style>
-<h1 class="text-3xl font-bold mb-6">Your Spells</h1>
+<h1 class="text-3xl font-bold mb-6">your spells</h1>
 
-<!-- Spell Selection Form -->
+<!-- spell selection form -->
 <form method="post" class="space-y-8">
     {% csrf_token %}
 
@@ -35,21 +35,22 @@
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             {% for spell in spellBookSpells %}
                 <div class="spell-card bg-gradient-to-b from-amber-50 to-amber-100 border-2 border-amber-300 rounded-lg shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 relative overflow-hidden">
-                    <!-- Page corner fold effect -->
+                    <!-- page corner fold effect -->
                     <div class="absolute top-0 right-0 w-0 h-0 border-l-[20px] border-l-transparent border-t-[20px] border-t-amber-200"></div>
                     
                     <label class="block p-4 cursor-pointer h-full">
-                        <input type="checkbox" name="selectedSpells" value="{{ spell.id }}" class="spell-checkbox absolute top-3 left-3 accent-amber-700 scale-125">
+                        <input type="checkbox" name="selectedspells" value="{{ spell.id }}" class="spell-checkbox absolute top-3 left-3 accent-amber-700 scale-125">
                         
                         <div class="ml-8 space-y-2">
                             <h3 class="text-lg font-bold text-amber-900 border-b border-amber-300 pb-1">{{ spell.name }}</h3>
                             
                             <div class="text-sm text-amber-800 space-y-1">
-                                <p class="italic font-medium">{{ spell.spellLevelType }}</p>
-                                {% if spell.castingTime %}<p><strong>Casting Time:</strong> {{ spell.castingTime }}</p>{% endif %}
-                                {% if spell.spellRange %}<p><strong>Range:</strong> {{ spell.spellRange }}</p>{% endif %}
-                                {% if spell.components %}<p><strong>Components:</strong> {{ spell.components }}</p>{% endif %}
+                                <p class="italic font-medium">{{ spell.spellleveltype }}</p>
+                                {% if spell.castingtime %}<p><strong>casting time:</strong> {{ spell.castingtime }}</p>{% endif %}
+                                {% if spell.spellrange %}<p><strong>range:</strong> {{ spell.spellrange }}</p>{% endif %}
+                                {% if spell.components %}<p><strong>components:</strong> {{ spell.components }}</p>{% endif %}
                                 {% if spell.duration %}<p><strong>Duration:</strong> {{ spell.duration }}</p>{% endif %}
+				{% if spell.spellschool %}<p><strong>Spell School:</strong> {{ spell.spellschool }}</p>{% endif %}
                             </div>
                             
                             {% if spell.description %}
@@ -65,7 +66,12 @@
     </div>
 
     <a href="spellBook/" class="block mt-6 px-6 py-3 bg-green-700 text-white font-bold rounded hover:bg-green-800">
-        Remove from Spell Boo {
+        Remove from Spell Book
+    </a>
+</form>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
     const checkboxes = document.querySelectorAll('.spell-checkbox');
     
     checkboxes.forEach(checkbox => {
