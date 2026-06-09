@@ -33,7 +33,7 @@
 
     <div>
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {% for spell in spellbookspells %}
+            {% for spell in spellBookSpells %}
                 <div class="spell-card bg-gradient-to-b from-amber-50 to-amber-100 border-2 border-amber-300 rounded-lg shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 relative overflow-hidden">
                     <!-- page corner fold effect -->
                     <div class="absolute top-0 right-0 w-0 h-0 border-l-[20px] border-l-transparent border-t-[20px] border-t-amber-200"></div>
@@ -42,16 +42,18 @@
                         <input type="checkbox" name="selectedspells" value="{{ spell.id }}" class="spell-checkbox absolute top-3 left-3 accent-amber-700 scale-125">
                         
                         <div class="ml-8 space-y-2">
-                            <h3 class="text-lg font-bold text-amber-900 border-b border-amber-300 pb-1">{{ spell.name }}</h3>
-                            
+			  
+  			   <h3 class="text-lg font-bold text-amber-900 border-b border-amber-300 pb-1">{{ spell.name }} <span class="text-sm italic text-amber-900"> - {{ spell.spellSchool }}</span></h3>
+
                             <div class="text-sm text-amber-800 space-y-1">
-                                {% if spell.castingtime %}<p><strong>casting time:</strong> {{ spell.castingtime }}</p>{% endif %}
-                                {% if spell.spellrange %}<p><strong>range:</strong> {{ spell.spellrange }}</p>{% endif %}
-                                {% if spell.components %}<p><strong>components:</strong> {{ spell.components }}</p>{% endif %}
+				{% if spell.spellSchool %}<p><strong>Spell School:</strong> {{ spell.spellSchool }}</p>{% endif %}
+				{% if spell.spellLevel %}<p><strong>Level:</strong> {{ spell.spellLevel }}</p>{% endif %}
+                                {% if spell.castingTime %}<p><strong>Casting Time:</strong> {{ spell.castingTime }}</p>{% endif %}
+                                {% if spell.spellRange %}<p><strong>Range:</strong> {{ spell.spellRange }}</p>{% endif %}
+                                {% if spell.components %}<p><strong>Components:</strong> {{ spell.components }}</p>{% endif %}
                                 {% if spell.duration %}<p><strong>Duration:</strong> {{ spell.duration }}</p>{% endif %}
-				{% if spell.spellschool %}<p><strong>Spell School:</strong> {{ spell.spellschool }}</p>{% endif %}
                             </div>
-                            
+         
                             {% if spell.description %}
                                 <div class="text-sm text-gray-700 mt-3 pt-2 border-t border-amber-200">
                                     <p class="leading-relaxed">{{ spell.description }}</p>

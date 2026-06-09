@@ -80,9 +80,8 @@
                     <label class="block p-4 cursor-pointer h-full">
                         <input type="checkbox" name="selectedSpells" value="{{ spell.id }}" {% if spell.id in selectedSpells %}checked{% endif %} class="spell-checkbox absolute top-3 left-3 accent-amber-700 scale-125">
                         
-                        <div class="ml-8 space-y-2">
-                            <h3 class="text-lg font-bold text-amber-900 border-b border-amber-300 pb-1">{{ spell.name }}</h3>
-                            
+					<h3 class="text-lg font-bold text-amber-900 border-b border-amber-300 pb-1">{{ spell.name }} <span class="text-xs italic text-amber-900"> - {{ spell.spellSchool }} - Spell Lists: {{ spell.spellList}}</span></h3>
+
                             <div class="text-sm text-amber-800 space-y-1">
 				{% if spell.spellLevel %}<p><strong>Level:</strong> {{ spell.spellLevel }}</p>{% endif %}
                                 {% if spell.castingTime %}<p><strong>Casting Time:</strong> {{ spell.castingTime }}</p>{% endif %}
