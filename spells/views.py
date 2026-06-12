@@ -6,6 +6,7 @@ def spellList(request):
     version = request.GET.get('version', '2024')
     selectedSpellList = request.GET.getlist('spellList')
     selectedSpells = request.session.get('selectedSpells', [])
+    spellList = SpellList.objects.all()
 
     if request.method == 'POST':
         selectedSpellIds = request.POST.getlist('selectedSpells')
@@ -30,6 +31,7 @@ def spellList(request):
         'spells': spells,
         'spellListOptions': spellListOptions,
         'selectedList': selectedSpellList,
+        'spellList': spellList,
         'selectedSpells': selectedSpells,
     })
 
