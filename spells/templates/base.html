@@ -101,7 +101,11 @@
         <!-- Action Buttons -->
         <div class="absolute bottom-0 right-4 flex">
             <button id="addToSpellBookBtn" class="nav-tab">
-                Add to Spell Book
+                {% if 'spellBook' in request.path %}
+        		Remove from Spell Book
+    		{% else %}
+        		Add to Spell Book
+    		{% endif %}
             </button>
             <button id="clearSpellBookBtn" class="nav-tab">
                 Clear Spell Book
@@ -154,7 +158,8 @@
                         case 'clearSpellBookBtn':
                             // Confirm and clear spell book
                             if (confirm('Are you sure you want to clear your entire spell book? This action cannot be undone.')) {
-                                
+                                // Add logic to clear spell book here
+                                alert('Spell book cleared! (This would need backend implementation)');
                             }
                             break;
                     }

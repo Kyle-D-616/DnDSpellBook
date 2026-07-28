@@ -5,7 +5,6 @@ from .models import Spells, SpellList
 def spellList(request):
     version = request.GET.get('version', '2024')
     selectedSpellList = request.GET.getlist('spellList')
-    selectedSpells = request.session.get('selectedSpells', [])
     spellList = SpellList.objects.all()
 
     if request.method == 'POST':
@@ -26,6 +25,7 @@ def spellList(request):
         spellListOptions = SpellList.objects.all()
 
 
+    selectedSpells = request.session.get('selectedSpells', [])
     return render(request, 'spells/spellList.html', {
         'version': version,
         'spells': spells,
@@ -37,6 +37,14 @@ def spellList(request):
 
 def spellBook(request):
     selectedSpellIds = request.session.get('selectedSpells', [])
+ 
+    if request.method == 'POST':
+        removableSpells = request.POST.getlist('removableSpells')
+        print(f"POST data:{removableSpells}")
+        selectedSpellIds = [id for id in selectedSpellIds if str(id) not in removableSpells]
+        request.session['selectedSpells'] = selectedSpellIds
+        request.session.modified = True
+
     spellBookSpells = Spells.objects.filter(id__in=selectedSpellIds)
     return render(request, 'spells/spellBook.html', {
         'spellBookSpells': spellBookSpells,
