@@ -24,6 +24,34 @@
         height: 3px;
         background: linear-gradient(90deg, transparent, rgba(139, 69, 19, 0.3), transparent);
     }
+
+    .filterdropbtn {
+	    background-color: #92400e;
+	    color: white;
+	    padding 16px;
+	    font-size 16px;
+	    border: none;
+	    cursor: pointer;
+    }
+
+    .filterdropbtn:hover, .filterdropbtn:focus {
+	    background-color: #1980B9;
+    }
+
+    .filterdropdown {
+	    position: relative;
+	    display: inline-block;
+    }
+
+    .filterdropdown-content {
+	    display: none;
+	    postition: absolute;
+	    background-color: #f1f1f1;
+	    min-width:160px;
+	    box-shadow: 0px 8px 16px 0px rgba(0.0.0.0.2);
+	    z-index: 1;
+    }
+
 </style>
 <h1 class="text-3xl font-bold mb-6">Pick Your Spells</h1>
 
@@ -41,7 +69,16 @@
         </a>
     {% endif %}
 </div>
-
+<div class="filterdropdown">
+	<button onclick= "changeFilterDropDown() "
+		class="filterdropbtn">Filter</button>
+	<div id= "filterDropDown" class="filterdropdown-content">
+		<a href= "#">Test val1</a>
+		<a href= "#">Test val2</a>
+		<a href= "#">Test val3</a>
+		<a href= "#">Test val4</a>
+	</div>
+</div>
 <!-- Filter Form -->
 <form method="get" class="mb-8 p-4 bg-amber-50 bg-opacity-80 rounded-xl shadow-md">
     <input type="hidden" name="version" value="{{ version }}">
@@ -82,7 +119,6 @@
                         
                         <div class="ml-8 space-y-2">
 				<h3 class="text-lg font-bold text-amber-900">{{ spell.name }} </h3>
-				<h3 class="text-xs italic text-amber-900 border-b border-amber-300 pb-1"> Spell Lists: {% for spelllist in spell.spellList.all %}{{ spelllist.name }}{% if not forloop.last %}, {% endif %}{% endfor %}</h3>
 
                             <div class="text-sm text-amber-800 space-y-1">
 				<p><strong>Spell List:</strong> {% for spelllist in spell.spellList.all %}{{ spelllist.name }}{% if not forloop.last %}, {% endif %}{% endfor %}</p>
