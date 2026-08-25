@@ -69,16 +69,20 @@
         </a>
     {% endif %}
 </div>
-<div class="filterdropdown">
-	<button onclick= "changeFilterDropDown() "
-		class="filterdropbtn">Filter</button>
-	<div id= "filterDropDown" class="filterdropdown-content">
-		<a href= "#">Test val1</a>
-		<a href= "#">Test val2</a>
-		<a href= "#">Test val3</a>
-		<a href= "#">Test val4</a>
-	</div>
+
+<!-- Search bar for spells -->
+<div>
+	<label for="site-search">Conjure a spell: </label>
+	<input type="search" id="site-search" name=q placeholder="Fireball" list="SearchableSpells">
+	<button>Search</button>
+
+	<datalist id="SearchableSpells">
+		{% for spell in spells %}
+		<option> {{ spell.name }} </option>
+		{% endfor %}
+	</datalist>
 </div>
+
 <!-- Filter Form -->
 <form method="get" class="mb-8 p-4 bg-amber-50 bg-opacity-80 rounded-xl shadow-md">
     <input type="hidden" name="version" value="{{ version }}">
