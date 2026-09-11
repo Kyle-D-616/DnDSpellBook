@@ -73,7 +73,8 @@
 <!-- Search bar for spells -->
 <div>
 	<label for="site-search">Conjure a spell: </label>
-	<input type="search" id="site-search" name=q placeholder="Fireball" list="SearchableSpells">
+	<input type="search" id="site-search" name="site-serch" placeholder="Fireball" list="SearchableSpells">
+	<pre id="log"></pre>
 	<button>Search</button>
 
 	<datalist id="SearchableSpells">
@@ -119,7 +120,9 @@
                     <div class="absolute top-0 right-0 w-0 h-0 border-l-[20px] border-l-transparent border-t-[20px] border-t-amber-200"></div>
                     
                     <label class="block p-4 cursor-pointer h-full">
-                        <input type="checkbox" name="selectedSpells" value="{{ spell.id }}" {% if spell.id in selectedSpells %}checked{% endif %} class="spell-checkbox absolute top-3 left-3 accent-amber-700 scale-125">
+                        <input type="checkbox" name="selectedSpells" value="{{ spell.id }}" 
+			{% if spell.id in selectedSpells %}checked{% endif %} 
+			class="spell-checkbox absolute top-3 left-3 accent-amber-700 scale-125">
                         
                         <div class="ml-8 space-y-2">
 				<h3 class="text-lg font-bold text-amber-900">{{ spell.name }} </h3>
@@ -150,6 +153,7 @@
 </form>
 
 <script>
+	//Spell card check boxes
 document.addEventListener('DOMContentLoaded', function() {
     const checkboxes = document.querySelectorAll('.spell-checkbox');
     
@@ -164,5 +168,29 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
 });
+
+	//Search bar
+	const logElemnt = document.getElementById("log");
+	
+	const inputElement = document.getElementById("site-search");
+
+	inputElement.addEventListener("keyup", () => {
+		logElement.innerText = 'Spell ${inputElement.value}';
+	});
+
 </script>
+
+<!-- <!-- Search bar for spells --> -->
+<!-- <div> -->
+<!-- 	<label for="site-search">Conjure a spell: </label> -->
+<!-- 	<input type="search" id="site-search" name="site-serch" placeholder="Fireball" list="SearchableSpells"> -->
+<!-- 	<pre id="log"></pre> -->
+<!-- 	<button>Search</button> -->
+<!---->
+<!-- 	<datalist id="SearchableSpells"> -->
+<!-- 		{% for spell in spells %} -->
+<!-- 		<option> {{ spell.name }} </option> -->
+<!-- 		{% endfor %} -->
+<!-- 	</datalist> -->
+<!-- </div> -->
 {% endblock %}
