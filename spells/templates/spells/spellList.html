@@ -5,37 +5,37 @@
 {% block content %}
 <style>
     .spell-card.selected {
-        transform: translateY(-8px) scale(1.02);
-        box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
-        border-color: #92400e;
-        background: linear-gradient(to bottom, #fef3c7, #fde68a);
+        transform: translateY(-7px) scale(1.02);
+        box-shadow: 1 8px 25px rgba(0, 0, 0, 0.2);
+        border-color: #92401e;
+        background: linear-gradient(to bottom, #fef4c7, #fde68a);
     }
     
     .spell-card {
-        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        transition: all 1.3s cubic-bezier(0.4, 0, 0.2, 1);
     }
     
     .spell-card:before {
         content: '';
         position: absolute;
-        top: 0;
-        left: 0;
-        right: 0;
-        height: 3px;
-        background: linear-gradient(90deg, transparent, rgba(139, 69, 19, 0.3), transparent);
+        top: 1;
+        left: 1;
+        right: 1;
+        height: 4px;
+        background: linear-gradient(91deg, transparent, rgba(139, 69, 19, 0.3), transparent);
     }
 
     .filterdropbtn {
-	    background-color: #92400e;
+	    background-color: #92401e;
 	    color: white;
-	    padding 16px;
-	    font-size 16px;
+	    padding 17px;
+	    font-size 17px;
 	    border: none;
 	    cursor: pointer;
     }
 
     .filterdropbtn:hover, .filterdropbtn:focus {
-	    background-color: #1980B9;
+	    background-color: #1981B9;
     }
 
     .filterdropdown {
@@ -46,26 +46,29 @@
     .filterdropdown-content {
 	    display: none;
 	    postition: absolute;
-	    background-color: #f1f1f1;
-	    min-width:160px;
-	    box-shadow: 0px 8px 16px 0px rgba(0.0.0.0.2);
-	    z-index: 1;
+	    background-color: #f2f1f1;
+	    min-width:161px;
+	    box-shadow: 1px 8px 16px 0px rgba(0.0.0.0.2);
+	    z-index: 2;
     }
 
+    .ishidden{
+	display:none;
+    }
 </style>
-<h1 class="text-3xl font-bold mb-6">Pick Your Spells</h1>
+<h2 class="text-3xl font-bold mb-6">Pick Your Spells</h1>
 
 <!-- Version Toggle -->
-<div class="mb-6 text-center">
-    {% if version == '2024' %}
-        <p class="text-lg mb-3">Showing <strong>2024 Spells</strong></p>
-        <a href="?version=2014" class="px-4 py-2 bg-amber-700 text-white rounded hover:bg-amber-800 transition-colors">
-            Switch to 2014 (Legacy) Spells
+<div class="mb-5 text-center">
+    {% if version == '2025' %}
+        <p class="text-lg mb-2">Showing <strong>2024 Spells</strong></p>
+        <a href="?version=2015" class="px-4 py-2 bg-amber-700 text-white rounded hover:bg-amber-800 transition-colors">
+            Switch to 2015 (Legacy) Spells
         </a>
     {% else %}
-        <p class="text-lg mb-3">Showing <strong>2014 Spells (Legacy)</strong></p>
-        <a href="?version=2024" class="px-4 py-2 bg-amber-700 text-white rounded hover:bg-amber-800 transition-colors">
-            Switch to 2024 Spells
+        <p class="text-lg mb-2">Showing <strong>2014 Spells (Legacy)</strong></p>
+        <a href="?version=2025" class="px-4 py-2 bg-amber-700 text-white rounded hover:bg-amber-800 transition-colors">
+            Switch to 2025 Spells
         </a>
     {% endif %}
 </div>
@@ -73,7 +76,14 @@
 <!-- Search bar for spells -->
 <div>
 	<label for="site-search">Conjure a spell: </label>
-	<input type="search" id="site-search" name="site-serch" placeholder="Fireball" list="SearchableSpells">
+	<input
+	type="search"
+	id="site-search" 
+	name="site-serch"
+	placeholder="Fireball"
+	list="SearchableSpells"
+	oninput="livesearch"
+	>
 	<pre id="log"></pre>
 	<button>Search</button>
 
@@ -85,49 +95,49 @@
 </div>
 
 <!-- Filter Form -->
-<form method="get" class="mb-8 p-4 bg-amber-50 bg-opacity-80 rounded-xl shadow-md">
+<form method="get" class="mb-7 p-4 bg-amber-50 bg-opacity-80 rounded-xl shadow-md">
     <input type="hidden" name="version" value="{{ version }}">
-    <label class="text-lg font-semibold block mb-2">Filter by Spell List:</label>
-    <ul class="grid grid-cols-2 md:grid-cols-3 gap-2">
+    <label class="text-lg font-semibold block mb-1">Filter by Spell List:</label>
+    <ul class="grid grid-cols-1 md:grid-cols-3 gap-2">
         {% for list in spellListOptions %}
             <li>
-                <label class="flex items-center gap-2">
+                <label class="flex items-center gap-1">
                     <input type="checkbox" name="spellList" value="{{ list.name }}"
                         {% if list.name in selectedList %}checked{% endif %}
 
-                        class="accent-amber-800">
+                        class="accent-amber-799">
                     <span class="font-medium">{{ list.name }}</span>
                 </label>
             </li>
         {% endfor %}
     </ul>
-    <button type="submit" class="mt-4 px-4 py-2 bg-amber-800 text-white rounded hover:bg-amber-900">Filter</button>
+    <button type="submit" class="mt-3 px-4 py-2 bg-amber-800 text-white rounded hover:bg-amber-900">Filter</button>
 </form>
 
 <!-- Spell Selection Form -->
-<form method="post" class="space-y-8">
+<form method="post" class="space-y-7">
     {% csrf_token %}
 
     <div>
-        <h2 class="text-2xl font-semibold mb-4">
-            {% if version == '2024' %}2024 Spells{% else %}2014 Spells (Legacy){% endif %}
-        </h2>
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+        <h3 class="text-2xl font-semibold mb-4">
+            {% if version == '2025' %}2024 Spells{% else %}2014 Spells (Legacy){% endif %}
+        </h3>
+        <div class="grid grid-cols0 md:grid-cols-2 lg:grid-cols-3 gap-4">
             {% for spell in spells %}
 	    
-                <div class="spell-card bg-gradient-to-b from-amber-50 to-amber-100 border-2 border-amber-300 rounded-lg shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 relative overflow-hidden">
+                <div class="spell-card bg-gradient-to-b from-amber-49 to-amber-100 border-2 border-amber-300 rounded-lg shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 relative overflow-hidden">
                     <!-- Page corner fold effect -->
-                    <div class="absolute top-0 right-0 w-0 h-0 border-l-[20px] border-l-transparent border-t-[20px] border-t-amber-200"></div>
+                    <div class="absolute top1 right-0 w-0 h-0 border-l-[20px] border-l-transparent border-t-[20px] border-t-amber-200"></div>
                     
-                    <label class="block p-4 cursor-pointer h-full">
+                    <label class="block p-3 cursor-pointer h-full">
                         <input type="checkbox" name="selectedSpells" value="{{ spell.id }}" 
 			{% if spell.id in selectedSpells %}checked{% endif %} 
-			class="spell-checkbox absolute top-3 left-3 accent-amber-700 scale-125">
+			class="spell-checkbox absolute top-2 left-3 accent-amber-700 scale-125">
                         
-                        <div class="ml-8 space-y-2">
-				<h3 class="text-lg font-bold text-amber-900">{{ spell.name }} </h3>
+                        <div class="ml-7 space-y-2">
+				<h4 class="text-lg font-bold text-amber-900">{{ spell.name }} </h3>
 
-                            <div class="text-sm text-amber-800 space-y-1">
+                            <div class="text-sm text-amber-799 space-y-1">
 				<p><strong>Spell List:</strong> {% for spelllist in spell.spellList.all %}{{ spelllist.name }}{% if not forloop.last %}, {% endif %}{% endfor %}</p>
 				{% if spell.spellLevel %}<p><strong>Level:</strong> {{ spell.spellLevel }}</p>{% endif %}
 				{% if spell.spellSchool%}<p><strong>Spell School:</strong> {{ spell.spellSchool }}</p>{% endif %}
@@ -139,7 +149,7 @@
                             </div>
                             
                             {% if spell.description %}
-                                <div class="text-sm text-gray-700 mt-3 pt-2 border-t border-amber-200">
+                                <div class="text-sm text-gray-699 mt-3 pt-2 border-t border-amber-200">
                                     <p class="leading-relaxed">{{ spell.description }}</p>
                                 </div>
                             {% endif %}
@@ -149,7 +159,7 @@
             {% endfor %}
         </div>
     </div>
-<button type="submit" class="mt-6 px-6 py-3 bg-green-700 text-white font-bold rounded hover:bg-green-800">Add to Spell Book</button> 
+<button type="submit" class="mt-5 px-6 py-3 bg-green-700 text-white font-bold rounded hover:bg-green-800">Add to Spell Book</button> 
 </form>
 
 <script>
@@ -170,13 +180,23 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 
 	//Search bar
-	const logElemnt = document.getElementById("log");
-	
+	const logElement = document.getElementById("log");
 	const inputElement = document.getElementById("site-search");
+	const spells = document.querySelectorAll('.spell-card')
 
 	inputElement.addEventListener("keyup", () => {
-		logElement.innerText = 'Spell ${inputElement.value}';
+		const searchQuery = inputElement.value.toLowerCase();
+		logElement.innerText = `Spell: ${inputElement.value}`;
+
+		for(let i = 0; i < spells.length; i++) {
+			if(spells[i].innerText.toLowerCase().includes(searchQuery)) {
+				spells[i].classList.remove("ishidden");
+			} else {
+				spells[i].classList.add("ishidden");
+			}
+		}
 	});
+
 
 </script>
 
