@@ -53,7 +53,7 @@
     }
 
     .ishidden{
-	display:none;
+	display: none;
     }
 </style>
 <h2 class="text-3xl font-bold mb-6">Pick Your Spells</h1>
@@ -82,7 +82,6 @@
 	name="site-serch"
 	placeholder="Fireball"
 	list="SearchableSpells"
-	oninput="livesearch"
 	>
 	<pre id="log"></pre>
 	<button>Search</button>
@@ -183,20 +182,27 @@ document.addEventListener('DOMContentLoaded', function() {
 	const logElement = document.getElementById("log");
 	const inputElement = document.getElementById("site-search");
 	const spells = document.querySelectorAll('.spell-card')
+	
+	//typing timer
+	let typingTimer;
+	let typeInterval = 500;
 
-	inputElement.addEventListener("keyup", () => {
+	function liveSearch() {
 		const searchQuery = inputElement.value.toLowerCase();
-		logElement.innerText = `Spell: ${inputElement.value}`;
+				logElement.innerText = `Spell: ${inputElement.value}`;
 
-		for(let i = 0; i < spells.length; i++) {
-			if(spells[i].innerText.toLowerCase().includes(searchQuery)) {
-				spells[i].classList.remove("ishidden");
-			} else {
-				spells[i].classList.add("ishidden");
+				for(let i = 0; i < spells.length; i++) {
+					if(spells[i].innerText.toLowerCase().includes(searchQuery)) {
+						spells[i].classList.remove("ishidden");
+					} else {
+						spells[i].classList.add("ishidden");
+					}
+				}
 			}
-		}
-	});
-
+			inputElement.addEventListener("keyup", () => {
+			clearTimeout(typingTimer);
+			typingTime = setTimeout(liveSearch, typeInterval);
+		});
 
 </script>
 
